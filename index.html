@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> ︎ ︎<</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title> ︎ ︎</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -16,19 +16,25 @@
         
         body {
             background-color: #15202b;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             height: 100vh;
+            padding: 0;
+            margin: 0;
+            position: relative;
+            overflow: hidden;
         }
         
         .dialog-container {
             width: 600px;
+            max-width: 98%;
             background-color: black;
             border-radius: 16px;
             overflow: hidden;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             color: #fff;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
         
         .dialog-header {
@@ -54,16 +60,26 @@
         
         .compose-area {
             display: flex;
-            padding: 12px 16px;
+            padding: 8px 12px;
         }
         
         .avatar {
-            width: 48px;
-            height: 48px;
+            width: 40px;
+            height: 40px;
+            min-width: 40px; /* Prevent shrinking on small screens */
             border-radius: 50%;
             background-color: #ccc;
             margin-right: 12px;
             overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensure image covers the entire container */
         }
         
         .compose-content {
@@ -89,16 +105,18 @@
         }
         
         .compose-text {
-            width: 100%;
-            min-height: 120px;
+            width: 105%;
+            min-height: 110px;
             border: none;
-            font-size: 20px;
+            font-size: 16px;
             resize: none;
             outline: none;
             margin-bottom: 20px;
             background-color: #000;
             color: #fff;
             padding: 5px;
+            font-size: 16px;
+            position: relative;
         }
         
         .compose-text::placeholder {
@@ -106,11 +124,12 @@
         }
         
         .typing-animation {
-            display: inline-block;
+            display: block;
             overflow: hidden;
-            white-space: nowrap;
+            white-space: pre; /* Use pre to preserve line breaks but not wrap */
             border-right: 2px solid rgb(29, 155, 240);
             width: 0; /* Start with width 0 to hide text */
+            max-width: 100%; /* Ensure it doesn't exceed container width */
         }
         
         .typing-animation.active {
@@ -151,6 +170,7 @@
         .media-tools {
             display: flex;
             gap: 16px;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
         }
         
         .tool-button {
@@ -243,9 +263,61 @@
             }
         }
         
+        /* Media queries for responsive design */
+        @media (max-width: 768px) {
+            .dialog-container {
+                width: 98%;
+                max-width: 98%;
+                margin: 5px;
+            }
+            
+            body {
+                padding: 2px;
+            }
+            
+            .compose-area {
+                padding: 8px;
+            }
+            
+            .compose-footer {
+                padding: 8px;
+            }
+            
+            .media-tools {
+                gap: 12px;
+            }
+            
+            .tool-button {
+                width: 18px;
+                height: 18px;
+            }
+            
+            .post-button {
+                padding: 6px 12px;
+            }
+            
+            .enter-text {
+                font-size: 32px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .media-tools {
+                gap: 8px;
+            }
+            
+            .tool-button i {
+                font-size: 16px;
+            }
+            
+            .compose-text {
+                min-height: 80px;
+            }
+        }
+        
         /* Cursor animation styles */
         .cursor {
-            position: absolute;
+            position: fixed; /* Changed to fixed for better positioning across devices */
             width: 20px;
             height: 20px;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M7,2l12,11.2l-5.8,0.5l3.3,7.3l-2.2,1l-3.2-7.4L7,18.5V2'/%3E%3C/svg%3E");
@@ -268,18 +340,18 @@
                 transform: translate(-50%, -50%);
             }
             80% {
-                top: calc(var(--button-top) + 15px);
-                left: calc(var(--button-left) + 40px);
+                top: var(--button-top);
+                left: var(--button-left);
                 transform: translate(0, 0);
             }
             90% {
-                top: calc(var(--button-top) + 15px);
-                left: calc(var(--button-left) + 40px);
+                top: var(--button-top);
+                left: var(--button-left);
                 transform: translate(0, 0) scale(0.9);
             }
             100% {
-                top: calc(var(--button-top) + 15px);
-                left: calc(var(--button-left) + 40px);
+                top: var(--button-top);
+                left: var(--button-left);
                 transform: translate(0, 0);
             }
         }
@@ -321,8 +393,25 @@
         </div>
     </div>
     <script>
+        // Center the dialog in the viewport
+        function centerDialog() {
+            const dialogContainer = document.querySelector('.dialog-container');
+            
+            // Force absolute positioning for proper centering
+            dialogContainer.style.position = 'absolute';
+            dialogContainer.style.top = '50%';
+            dialogContainer.style.left = '50%';
+            dialogContainer.style.transform = 'translate(-50%, -50%)';
+            dialogContainer.style.margin = '0';
+        }
+        
         // Reset and start animations when page loads
         document.addEventListener('DOMContentLoaded', function() {
+            // Center the dialog
+            centerDialog();
+            
+            // Recenter on window resize
+            window.addEventListener('resize', centerDialog);
             const typingElement = document.querySelector('.typing-animation');
             const postButton = document.querySelector('.post-button');
             const dialogContainer = document.querySelector('.dialog-container');
@@ -330,26 +419,42 @@
             const body = document.body;
             const cursor = document.getElementById('cursor');
             
-            // Get Post button position for cursor animation
-            const buttonRect = postButton.getBoundingClientRect();
-            document.documentElement.style.setProperty('--button-top', buttonRect.top + 'px');
-            document.documentElement.style.setProperty('--button-left', buttonRect.left + 'px');
+            // Function to update button position for cursor animation
+            function updateButtonPosition() {
+                const buttonRect = postButton.getBoundingClientRect();
+                document.documentElement.style.setProperty('--button-top', (buttonRect.top + buttonRect.height/2) + 'px');
+                document.documentElement.style.setProperty('--button-left', (buttonRect.left + buttonRect.width/2) + 'px');
+            }
+            
+            // Initial position
+            updateButtonPosition();
+            
+            // Update position on window resize
+            window.addEventListener('resize', updateButtonPosition);
+            
+            // Calculate the width of the text container
+            const composeTextWidth = document.querySelector('.compose-text').offsetWidth - 20; // Subtract padding
+            
+            // Set a custom property for the text width
+            document.documentElement.style.setProperty('--text-container-width', composeTextWidth + 'px');
             
             // Start typing animation after a short delay
             setTimeout(function() {
                 typingElement.classList.add('active');
                 
-                // After typing completes, animate cursor to click the Post button
+                // After typing completes, stop the cursor blinking and fix the width
                 setTimeout(function() {
                     // Stop the cursor blinking and fix the width to prevent extra space
                     typingElement.style.borderRight = 'none';
                     typingElement.style.width = 'auto';
                     
-                    // Show and animate the cursor
-                    cursor.classList.add('active');
-                    
-                    // After cursor reaches button, animate the button click
+                    // Wait a moment before showing the cursor
                     setTimeout(function() {
+                        // Show and animate the cursor
+                        cursor.classList.add('active');
+                        
+                        // After cursor reaches button, animate the button click
+                        setTimeout(function() {
                         postButton.classList.add('clicked');
                         
                         // After a short delay, fade out the dialog (simulating post submission)
@@ -370,14 +475,15 @@
                                 });
                             }, 1000);
                         }, 500);
-                    }, 1200); // Time for cursor to reach button
-                }, 5000); // Wait for typing animation to complete
+                        }, 1200); // Time for cursor to reach button
+                    }, 500); // Wait before showing cursor
+                }, 5500); // Wait for typing animation to complete (increased from 5000 to 7000)
             }, 1000);
         });
     </script>
     <!-- Enter dialog that appears after posting -->
     <div class="enter-dialog" id="enterDialog">
-        <div class="enter-text" id="enterText">Enter</div>
+        <div class="enter-text" id="enterText">𒐪</div>
     </div>
     <!-- Cursor element for click animation -->
     <div class="cursor" id="cursor"></div>
