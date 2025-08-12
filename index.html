@@ -636,7 +636,7 @@
                     // Position origin tweet at the center of the wormhole
                     x = originX;
                     y = originY;
-                    size = dotSize * 1.5; // Origin is 1.5x larger
+                    size = dotSize * 1.7; // Origin is 1.7x larger
                 } else {
                     // For non-origin tweets, ensure they're not too close to the origin
                     // and don't overlap with other dots
@@ -648,10 +648,21 @@
                         // Random position within the visible area with margins
                         const horizontalMargin = Math.max(100, canvas.width * 0.1); // At least 10% of width
                         const verticalMargin = Math.max(100, canvas.height * 0.1); // At least 10% of height
-                        const footerMargin = 100; // Keep clear of footer
+                        const footerMargin = 120; // Increased footer margin to avoid overlapping with logos
+                        
+                        // Calculate available height, ensuring we stay clear of the footer area
+                        const availableHeight = canvas.height - footerMargin - verticalMargin;
+                        
+                        // If available height is too small, prioritize staying away from footer
+                        const effectiveVerticalMargin = availableHeight < 300 ? 50 : verticalMargin;
                         
                         x = horizontalMargin + Math.random() * (canvas.width - 2 * horizontalMargin);
-                        y = verticalMargin + Math.random() * (canvas.height - footerMargin - verticalMargin);
+                        y = effectiveVerticalMargin + Math.random() * (availableHeight - effectiveVerticalMargin);
+                        
+                        // Additional check to ensure we're not in the footer area
+                        if (y > canvas.height - footerMargin) {
+                            y = canvas.height - footerMargin - dotSize * 3; // Keep well above footer
+                        }
                         
                         // Calculate distance from origin
                         const dx = x - originX;
@@ -705,24 +716,29 @@
             // Only draw if images are loaded
             if (profileImages.length === 0) return;
             
+            // Set image smoothing for better quality
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            
             // First draw non-origin dots
             coloredDots.filter(dot => !dot.isOrigin).forEach(dot => {
-                // Pulsating effect
+                // Pulsating effect for the border only
                 dot.pulsating += dot.pulsateSpeed;
-                const pulseFactor = 1 + 0.18 * Math.sin(dot.pulsating);
+                const pulseFactor = 1 + 0.1 * Math.sin(dot.pulsating);
                 
                 // Save context for clipping
                 ctx.save();
                 
-                // Create circular clipping path
+                // Create circular clipping path that pulsates
                 ctx.beginPath();
                 ctx.arc(dot.x, dot.y, dot.size * pulseFactor, 0, Math.PI * 2);
                 ctx.clip();
                 
-                // Draw the profile image
+                // Draw the profile image at a fixed size (not affected by pulsation)
+                // This prevents blurriness from constant resizing
                 const img = profileImages[dot.imageIndex];
-                const imgSize = dot.size * 2 * pulseFactor;
-                ctx.drawImage(img, dot.x - imgSize/2, dot.y - imgSize/2, imgSize, imgSize);
+                const baseImgSize = dot.size * 2.2; // Slightly larger than the clip to avoid edge artifacts
+                ctx.drawImage(img, dot.x - baseImgSize/2, dot.y - baseImgSize/2, baseImgSize, baseImgSize);
                 
                 // Restore context
                 ctx.restore();
@@ -741,9 +757,9 @@
                 dot.x = wormhole.x;
                 dot.y = wormhole.y;
                 
-                // Stronger pulsating effect for origin
+                // Stronger pulsating effect for origin (border only)
                 dot.pulsating += dot.pulsateSpeed * 1.5;
-                const pulseFactor = 1 + 0.1 * Math.sin(dot.pulsating);
+                const pulseFactor = 1 + 0.02 * Math.sin(dot.pulsating);
                 
                 // Save context for clipping
                 ctx.save();
@@ -753,10 +769,10 @@
                 ctx.arc(dot.x, dot.y, dot.size * pulseFactor, 0, Math.PI * 2);
                 ctx.clip();
                 
-                // Draw the profile image
+                // Draw the profile image at a fixed size
                 const img = profileImages[dot.imageIndex];
-                const imgSize = dot.size * 2 * pulseFactor;
-                ctx.drawImage(img, dot.x - imgSize/2, dot.y - imgSize/2, imgSize, imgSize);
+                const baseImgSize = dot.size * 2.2; // Slightly larger than the clip
+                ctx.drawImage(img, dot.x - baseImgSize/2, dot.y - baseImgSize/2, baseImgSize, baseImgSize);
                 
                 // Restore context
                 ctx.restore();
@@ -975,13 +991,24 @@
         // Create dots immediately
         createColoredDots();
         
-        // Also ensure dots are recreated after window fully loads
-        // This helps with positioning if window size changes during load
+        // Also ensure dots are recreated after window fully loads and on resize
+        // This helps with positioning if window size changes
         window.addEventListener('load', () => {
             // Clear existing dots
             coloredDots.length = 0;
             // Create new dots
             createColoredDots();
+        });
+        
+        // Recreate dots on window resize to ensure proper positioning
+        window.addEventListener('resize', () => {
+            // Wait a short moment for resize to complete
+            setTimeout(() => {
+                // Clear existing dots
+                coloredDots.length = 0;
+                // Create new dots with updated dimensions
+                createColoredDots();
+            }, 200);
         });
         
         // Start animation with timestamp
