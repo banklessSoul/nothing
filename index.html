@@ -40,6 +40,7 @@
             border-radius: 10px;
             padding: 15px;
             max-width: 400px;
+            width: calc(100% - 40px); /* Responsive width */
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
             color: #eee;
             font-size: 14px;
@@ -47,6 +48,31 @@
             z-index: 100;
             display: none;
             border: 1px solid #333;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .tweet-popup {
+                max-width: 300px;
+                padding: 10px;
+            }
+            
+            .social-logo {
+                width: 32px;
+                height: 32px;
+            }
+            
+            .x-logo {
+                left: 50%;
+            }
+            
+            .dex-logo {
+                left: calc(50% + 40px);
+            }
+            
+            .eth-logo {
+                left: calc(50% - 40px);
+            }
         }
         
         .tweet-popup .tweet-header {
@@ -102,6 +128,17 @@
             filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
         }
         
+        /* Footer area - keep this space clear */
+        .footer-area {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px; /* Height of the footer area to keep clear */
+            z-index: 40;
+            pointer-events: none; /* Allow clicks to pass through */
+        }
+        
         .social-logo:hover {
             opacity: 1;
             transform: scale(1.1);
@@ -141,6 +178,7 @@
 <body>
     <div class="info"> ︎ ︎</div>
     <canvas id="blackHoleCanvas"></canvas>
+    <div class="footer-area"></div>
     
     <!-- Social links -->
     <a href="https://x.com/i/communities/1847401123151564807" target="_blank" class="social-logo x-logo">
@@ -580,30 +618,40 @@
             const originY = wormhole.y;
             const minDistanceFromOrigin = 150; // Minimum distance from origin in pixels
             
+            // Determine base size based on screen size
+            const isMobile = window.innerWidth < 768;
+            const baseSizeDesktop = 18;
+            const baseSizeMobile = 14; // Smaller on mobile
+            const baseSize = isMobile ? baseSizeMobile : baseSizeDesktop;
+            
             // Create one dot for each tweet in tweetsData
             for (let i = 0; i < tweetsData.length; i++) {
                 const tweet = tweetsData[i];
                 let x, y, size;
                 
-                // First determine the base size (reduced by 10%)
-                const baseSize = 18 + Math.random() * 9; 
+                // Determine size with some randomness
+                const dotSize = baseSize + Math.random() * (isMobile ? 6 : 9);
                 
                 if (tweet.type === 'origin') {
                     // Position origin tweet at the center of the wormhole
                     x = originX;
                     y = originY;
-                    size = baseSize * 1.5;
+                    size = dotSize * 1.5; // Origin is 1.5x larger
                 } else {
                     // For non-origin tweets, ensure they're not too close to the origin
+                    // and don't overlap with other dots
                     let isValidPosition = false;
                     let attempts = 0;
-                    const maxAttempts = 50; // Prevent infinite loop
+                    const maxAttempts = 100; // More attempts to find valid position
                     
                     while (!isValidPosition && attempts < maxAttempts) {
-                        // Random position within the visible area (with margin)
-                        const margin = 100;
-                        x = margin + Math.random() * (canvas.width - 2 * margin);
-                        y = margin + Math.random() * (canvas.height - 2 * margin);
+                        // Random position within the visible area with margins
+                        const horizontalMargin = Math.max(100, canvas.width * 0.1); // At least 10% of width
+                        const verticalMargin = Math.max(100, canvas.height * 0.1); // At least 10% of height
+                        const footerMargin = 100; // Keep clear of footer
+                        
+                        x = horizontalMargin + Math.random() * (canvas.width - 2 * horizontalMargin);
+                        y = verticalMargin + Math.random() * (canvas.height - footerMargin - verticalMargin);
                         
                         // Calculate distance from origin
                         const dx = x - originX;
@@ -611,13 +659,32 @@
                         const distanceFromOrigin = Math.sqrt(dx * dx + dy * dy);
                         
                         // Check if position is valid (not too close to origin)
-                        if (distanceFromOrigin > minDistanceFromOrigin) {
-                            isValidPosition = true;
+                        let validDistance = distanceFromOrigin > minDistanceFromOrigin;
+                        
+                        // Check for overlap with existing dots
+                        let noOverlap = true;
+                        const minDistanceBetweenDots = dotSize * 2.5; // Minimum distance between dots
+                        
+                        for (let j = 0; j < coloredDots.length; j++) {
+                            const otherDot = coloredDots[j];
+                            const dxDot = x - otherDot.x;
+                            const dyDot = y - otherDot.y;
+                            const distanceBetweenDots = Math.sqrt(dxDot * dxDot + dyDot * dyDot);
+                            
+                            if (distanceBetweenDots < minDistanceBetweenDots) {
+                                noOverlap = false;
+                                break;
+                            }
                         }
                         
+                        // Position is valid if it's far enough from origin and doesn't overlap
+                        isValidPosition = validDistance && noOverlap;
                         attempts++;
                     }
-                    size = baseSize;
+                    
+                    // If we couldn't find a non-overlapping position after max attempts,
+                    // just use the last position we tried
+                    size = dotSize;
                 }
                 
                 // Add dot with profile image
@@ -757,21 +824,29 @@
             document.getElementById('tweetTimestamp').textContent = tweet.timestamp;
             
             // Position popup near the dot but ensure it stays within viewport
-            const popupWidth = 400;
+            const popupWidth = Math.min(400, window.innerWidth - 40); // Responsive width
             const popupHeight = 180;
+            
+            // Get footer height to avoid overlapping
+            const footerHeight = 80; // Same as footer-area height
             
             let left = mouseX + 20;
             let top = mouseY - popupHeight / 2;
             
             // Adjust if too close to right edge
             if (left + popupWidth > window.innerWidth) {
-                left = mouseX - popupWidth - 20;
+                left = Math.max(10, mouseX - popupWidth - 20);
             }
             
             // Adjust if too close to top/bottom edge
             if (top < 10) top = 10;
-            if (top + popupHeight > window.innerHeight - 10) {
-                top = window.innerHeight - popupHeight - 10;
+            if (top + popupHeight > window.innerHeight - footerHeight) {
+                top = window.innerHeight - popupHeight - footerHeight;
+            }
+            
+            // For mobile, center horizontally if screen is narrow
+            if (window.innerWidth < 500) {
+                left = (window.innerWidth - popupWidth) / 2;
             }
             
             // Set position and show popup
@@ -820,6 +895,75 @@
                 // Get tweet data for this dot
                 const tweet = tweetsData[hoveredDotIndex];
                 window.open(tweet.url, '_blank');
+            }
+        });
+        
+        // Touch events for mobile support
+        let touchTimer = null;
+        let lastTouchX = 0;
+        let lastTouchY = 0;
+        
+        // Touch start handler
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Prevent scrolling when touching the canvas
+            
+            if (e.touches.length > 0) {
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                lastTouchX = touch.clientX;
+                lastTouchY = touch.clientY;
+                
+                const touchX = touch.clientX - rect.left;
+                const touchY = touch.clientY - rect.top;
+                
+                const touchedDotIndex = checkDotHover(touchX, touchY);
+                
+                if (touchedDotIndex >= 0) {
+                    // Show popup on touch
+                    showTweetPopup(touchedDotIndex, touch.clientX, touch.clientY);
+                    
+                    // Set a timer to detect long press
+                    touchTimer = setTimeout(() => {
+                        // Long press - open the URL
+                        const tweet = tweetsData[touchedDotIndex];
+                        window.open(tweet.url, '_blank');
+                        touchTimer = null;
+                    }, 800); // 800ms for long press
+                }
+            }
+        });
+        
+        // Touch end handler
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            
+            // Clear the long press timer
+            if (touchTimer) {
+                clearTimeout(touchTimer);
+                touchTimer = null;
+            }
+            
+            // Hide popup after a short delay to allow for reading
+            setTimeout(() => {
+                hideTweetPopup();
+            }, 1000);
+        });
+        
+        // Touch move handler
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            
+            // If moved too far, cancel the long press
+            if (touchTimer && e.touches.length > 0) {
+                const touch = e.touches[0];
+                const dx = touch.clientX - lastTouchX;
+                const dy = touch.clientY - lastTouchY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance > 10) { // If moved more than 10px
+                    clearTimeout(touchTimer);
+                    touchTimer = null;
+                }
             }
         });
         
