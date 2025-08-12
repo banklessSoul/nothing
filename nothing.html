@@ -48,7 +48,19 @@
             z-index: 100;
             display: none;
             border: 1px solid #333;
-            transition: background-color 0.2s ease;
+            transition: all 0.5s ease;
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        
+        .tweet-popup.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .tweet-popup.fading {
+            opacity: 0;
+            transform: scale(0.8);
         }
         
         /* Responsive styles */
@@ -161,12 +173,48 @@
         .social-logo:hover {
             transform: scale(1.1); /* Simplified hover effect */
         }
+        
+        /* Animation controls */
+        .animation-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 200;
+        }
+        
+        .animation-button {
+            background-color: rgba(29, 155, 240, 0.8);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .animation-button:hover {
+            background-color: rgba(29, 155, 240, 1);
+        }
+        
+        /* Animation for tweet dots */
+        @keyframes pulseAndGlow {
+            0% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.3); filter: brightness(1.5); }
+            100% { transform: scale(1); filter: brightness(1); }
+        }
+        
+        .dot-pulse {
+            animation: pulseAndGlow 0.8s ease-in-out;
+        }
     </style>
 </head>
 <body>
     <div class="info"> ︎ ︎</div>
     <canvas id="blackHoleCanvas"></canvas>
     <div class="footer-area"></div>
+    
+    <!-- Animation starts automatically on page load -->
     
     <!-- Social links in a centered container -->
     <div class="logo-container">
@@ -1018,6 +1066,9 @@
         
         // Mouse move event handler
         canvas.addEventListener('mousemove', (e) => {
+            // Skip hover handling if animation is running
+            if (isAnimationRunning) return;
+            
             const rect = canvas.getBoundingClientRect();
             
             // Get mouse position in canvas coordinates
@@ -1046,6 +1097,9 @@
         
         // Click event handler for opening tweet
         canvas.addEventListener('click', (e) => {
+            // Skip click handling if animation is running
+            if (isAnimationRunning) return;
+            
             const rect = canvas.getBoundingClientRect();
             
             // Get mouse position in canvas coordinates
@@ -1079,6 +1133,9 @@
         // Touch start handler
         canvas.addEventListener('touchstart', (e) => {
             e.preventDefault(); // Prevent scrolling when touching the canvas
+            
+            // Skip touch handling if animation is running
+            if (isAnimationRunning) return;
             
             // Hide any existing popup first
             hideTweetPopup();
@@ -1175,6 +1232,182 @@
             }
         });
         
+        // Viral movement animation
+        let isAnimationRunning = false;
+        
+        // Sort tweets by timestamp for chronological animation
+        const sortedTweets = [...tweetsData].sort((a, b) => {
+            // Always put origin tweet first
+            if (a.type === 'origin') return -1;
+            if (b.type === 'origin') return 1;
+            
+            // Parse dates for comparison
+            // Convert month names to numbers
+            const monthMap = {
+                'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
+                'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
+            };
+            
+            const parseDate = (dateStr) => {
+                const parts = dateStr.split(' ');
+                const month = monthMap[parts[0]];
+                const day = parseInt(parts[1].replace(',', ''));
+                const year = parseInt(parts[2]);
+                return new Date(year, month, day);
+            };
+            
+            return parseDate(a.timestamp) - parseDate(b.timestamp);
+        });
+        
+        function startViralAnimation() {
+            if (isAnimationRunning) return;
+            isAnimationRunning = true;
+            
+            console.log("Viral animation started");
+            
+            // Hide any visible popups
+            hideTweetPopup();
+            
+            // Create a new popup for animation
+            const animPopup = document.createElement('div');
+            animPopup.className = 'tweet-popup';
+            animPopup.id = 'animationPopup';
+            document.body.appendChild(animPopup);
+            
+            // Animation timing variables
+            const initialDelay = 100; // Wait before starting
+            const popupDuration = 2000; // How long each popup stays visible
+            const transitionTime = 800; // Fade in/out time
+            const pulseTime = 500; // Dot pulse animation time
+            
+            // Start animation sequence
+            setTimeout(() => {
+                // Animate each tweet in chronological order
+                animateTweetsSequentially(0);
+            }, initialDelay);
+            
+            function animateTweetsSequentially(index) {
+                if (index >= sortedTweets.length) {
+                    // Animation complete
+                    finishAnimation();
+                    return;
+                }
+                
+                const tweet = sortedTweets[index];
+                
+                // Determine animation speed - much faster after origin tweet
+                const isOriginTweet = tweet.type === 'origin';
+                const speedMultiplier = isOriginTweet ? 1 : 4; 
+                
+                // Find the corresponding dot
+                const dotIndex = tweetsData.findIndex(t => t.id === tweet.id);
+                const dot = coloredDots[dotIndex];
+                
+                // Create popup content
+                animPopup.innerHTML = `
+                    <div class="tweet-header">
+                        <img class="profile-pic" src="${tweet.profilePic}" alt="Profile Picture">
+                        <div class="user-info">
+                            <div class="name">${tweet.author}</div>
+                            <div class="username">${tweet.username}</div>
+                        </div>
+                    </div>
+                    <div class="content">${tweet.content}</div>
+                    <div class="timestamp">${tweet.timestamp}</div>
+                `;
+                
+                // Position popup near the dot
+                const popupWidth = 400;
+                const popupHeight = 150;
+                
+                // Position differently based on screen quadrant to avoid edges
+                let left, top;
+                
+                if (dot.x < canvas.width / 2) {
+                    // Left half of screen - position to the right of dot
+                    left = dot.x + dot.size * 2;
+                } else {
+                    // Right half of screen - position to the left of dot
+                    left = dot.x - popupWidth - dot.size * 2;
+                }
+                
+                if (dot.y < canvas.height / 2) {
+                    // Top half - position below dot
+                    top = dot.y + dot.size * 2;
+                } else {
+                    // Bottom half - position above dot
+                    top = dot.y - popupHeight - dot.size * 2;
+                }
+                
+                // Ensure popup stays within viewport
+                left = Math.max(20, Math.min(window.innerWidth - popupWidth - 20, left));
+                top = Math.max(20, Math.min(window.innerHeight - popupHeight - 20, top));
+                
+                // Set position
+                animPopup.style.left = left + 'px';
+                animPopup.style.top = top + 'px';
+                
+                // Show popup with animation
+                animPopup.style.display = 'block';
+                
+                // Add pulse effect to the dot
+                const dotElement = document.createElement('div');
+                dotElement.className = 'dot-pulse-overlay';
+                dotElement.style.position = 'absolute';
+                dotElement.style.left = (dot.x - dot.size * 1.5) + 'px';
+                dotElement.style.top = (dot.y - dot.size * 1.5) + 'px';
+                dotElement.style.width = (dot.size * 3) + 'px';
+                dotElement.style.height = (dot.size * 3) + 'px';
+                dotElement.style.borderRadius = '50%';
+                dotElement.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+                dotElement.style.zIndex = '90';
+                document.body.appendChild(dotElement);
+                
+                // Animate dot pulse
+                dotElement.animate([
+                    { transform: 'scale(0.8)', opacity: 0.8 },
+                    { transform: 'scale(1.5)', opacity: 0 }
+                ], {
+                    duration: pulseTime,
+                    iterations: 2
+                });
+                
+                // Fade in popup
+                setTimeout(() => {
+                    animPopup.classList.add('visible');
+                    
+                    // Schedule fade out - adjust timing based on speed multiplier
+                    setTimeout(() => {
+                        animPopup.classList.remove('visible');
+                        animPopup.classList.add('fading');
+                        
+                        // Remove pulse overlay
+                        setTimeout(() => {
+                            if (dotElement.parentNode) {
+                                dotElement.parentNode.removeChild(dotElement);
+                            }
+                        }, transitionTime / 2 / speedMultiplier);
+                        
+                        // Move to next tweet after transition
+                        setTimeout(() => {
+                            animPopup.classList.remove('fading');
+                            animateTweetsSequentially(index + 1);
+                        }, transitionTime / speedMultiplier);
+                    }, popupDuration / speedMultiplier);
+                }, 100);
+            }
+            
+            function finishAnimation() {
+                // Clean up
+                if (animPopup.parentNode) {
+                    animPopup.parentNode.removeChild(animPopup);
+                }
+                
+                isAnimationRunning = false;
+                
+                
+            }
+        }
         
         // Initialize
         initParticles();
@@ -1182,6 +1415,24 @@
         
         // Create dots immediately
         createColoredDots();
+        
+        // Start animation automatically when page loads
+        window.addEventListener('load', () => {
+            // Wait just 1 second before starting animation
+            setTimeout(() => {
+                console.log("Starting viral animation...");
+                startViralAnimation();
+            }, 1000);
+        });
+        // Start animation automatically when page loads
+        window.addEventListener('load', () => {
+            // Wait just 1 second before starting animation
+            setTimeout(() => {
+                console.log("Starting viral animation...");
+                startViralAnimation();
+            }, 1000);
+        });
+        
         
         // Also ensure dots are recreated after window fully loads
         // This helps with positioning if window size changes during load
