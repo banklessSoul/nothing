@@ -659,7 +659,7 @@
                     
                     // Define margins
                     const horizontalMargin = Math.max(80, canvas.width * 0.08); // Slightly smaller margins
-                    const topMargin = Math.max(80, canvas.height * 0.08);
+                    const topMargin = Math.max(isMobile ? 150 : 80, canvas.height * 0.12); // Increased top margin on mobile
                     const footerMargin = 150; // Increased footer margin to keep circles away from logos
                     
                     // Calculate available space for grid
@@ -733,6 +733,11 @@
                         // Additional check to ensure we're not in the footer area
                         if (y > canvas.height - footerMargin) {
                             y = canvas.height - footerMargin - dotSize * 4; // Keep even further above footer
+                        }
+                        
+                        // Additional check to ensure we're not too close to the top (for popup visibility)
+                        if (y < topMargin) {
+                            y = topMargin + dotSize * 2; // Keep below top margin
                         }
                         
                         // Calculate distance from origin (using the variables we already defined)
@@ -971,7 +976,7 @@
             
             // Position popup near the dot but ensure it stays within viewport
             const popupWidth = Math.min(400, window.innerWidth - 40); // Responsive width
-            const popupHeight = 180;
+            const popupHeight = isMobile ? 200 : 180; // Slightly taller on mobile to account for "Tap to open" text
             
             // Get footer height to avoid overlapping
             const footerHeight = 80; // Same as footer-area height
@@ -985,9 +990,13 @@
             }
             
             // Adjust if too close to top/bottom edge
-            if (top < 10) top = 10;
+            if (top < 20) {
+                // If near top, position below the dot instead of centered
+                top = mouseY + 20;
+            }
             if (top + popupHeight > window.innerHeight - footerHeight) {
-                top = window.innerHeight - popupHeight - footerHeight;
+                // If near bottom, position above the dot
+                top = mouseY - popupHeight - 20;
             }
             
             // For mobile, center horizontally if screen is narrow
@@ -1070,6 +1079,9 @@
         // Touch start handler
         canvas.addEventListener('touchstart', (e) => {
             e.preventDefault(); // Prevent scrolling when touching the canvas
+            
+            // Hide any existing popup first
+            hideTweetPopup();
             
             if (e.touches.length > 0) {
                 const touch = e.touches[0];
