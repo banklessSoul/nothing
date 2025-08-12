@@ -59,8 +59,8 @@
             }
             
             .social-logo {
-                width: 32px;
-                height: 32px;
+                width: 28px; /* Even smaller on mobile */
+                height: 28px; /* Even smaller on mobile */
             }
             
             .logo-container {
@@ -113,8 +113,8 @@
         .social-logo {
             position: fixed;
             bottom: 20px;
-            width: 40px;
-            height: 40px;
+            width: 36px; /* Slightly smaller logos */
+            height: 36px; /* Slightly smaller logos */
             z-index: 50;
             opacity: 0.7;
             transition: all 0.3s ease;
@@ -660,7 +660,7 @@
                     // Define margins
                     const horizontalMargin = Math.max(80, canvas.width * 0.08); // Slightly smaller margins
                     const topMargin = Math.max(80, canvas.height * 0.08);
-                    const footerMargin = 120; // Keep footer margin the same
+                    const footerMargin = 150; // Increased footer margin to keep circles away from logos
                     
                     // Calculate available space for grid
                     const availableWidth = canvas.width - 2 * horizontalMargin;
@@ -732,7 +732,7 @@
                         
                         // Additional check to ensure we're not in the footer area
                         if (y > canvas.height - footerMargin) {
-                            y = canvas.height - footerMargin - dotSize * 3; // Keep well above footer
+                            y = canvas.height - footerMargin - dotSize * 4; // Keep even further above footer
                         }
                         
                         // Calculate distance from origin (using the variables we already defined)
@@ -811,8 +811,12 @@
                 const imgX = dot.x - baseImgSize/2;
                 const imgY = dot.y - baseImgSize/2;
                 
+                // Force square dimensions for the image
+                const imgWidth = baseImgSize;
+                const imgHeight = baseImgSize;
+                
                 // Draw the image with equal width and height to maintain aspect ratio
-                ctx.drawImage(img, imgX, imgY, baseImgSize, baseImgSize);
+                ctx.drawImage(img, 0, 0, img.width, img.height, imgX, imgY, imgWidth, imgHeight);
                 
                 // Restore context
                 ctx.restore();
@@ -853,8 +857,12 @@
                 const imgX = dot.x - baseImgSize/2;
                 const imgY = dot.y - baseImgSize/2;
                 
+                // Force square dimensions for the image
+                const imgWidth = baseImgSize;
+                const imgHeight = baseImgSize;
+                
                 // Draw the image with equal width and height to maintain aspect ratio
-                ctx.drawImage(img, imgX, imgY, baseImgSize, baseImgSize);
+                ctx.drawImage(img, 0, 0, img.width, img.height, imgX, imgY, imgWidth, imgHeight);
                 
                 // Restore context
                 ctx.restore();
@@ -898,15 +906,23 @@
             
             // Adjust for any scaling between CSS pixels and canvas pixels
             const canvasRect = canvas.getBoundingClientRect();
+            
+            // Use direct ratio calculation to avoid rounding errors
             const scaleX = canvas.width / canvasRect.width;
             const scaleY = canvas.height / canvasRect.height;
             
-            // Apply scaling to mouse coordinates
-            const adjustedX = mouseX * scaleX;
-            const adjustedY = mouseY * scaleY;
+            // Apply scaling to mouse coordinates - use the raw coordinates
+            const adjustedX = mouseX;
+            const adjustedY = mouseY;
             
             // Check each dot with a slightly larger hit area on mobile
-            const hitAreaMultiplier = isMobile ? 2.0 : 1.5;
+            const hitAreaMultiplier = isMobile ? 2.5 : 1.5; // Even larger hit area on mobile
+            
+            // Debug info
+            console.log(`Mouse/Touch at: ${adjustedX}, ${adjustedY}`);
+            
+            // Check all dots, but prioritize those closest to the touch point
+            const dotDistances = [];
             
             for (let i = 0; i < coloredDots.length; i++) {
                 const dot = coloredDots[i];
@@ -914,10 +930,21 @@
                 const dy = adjustedY - dot.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
                 
-                if (distance < dot.size * hitAreaMultiplier) {
-                    return i; // Return index of hovered dot
+                // Store distance and index
+                dotDistances.push({ index: i, distance: distance, hitRadius: dot.size * hitAreaMultiplier });
+            }
+            
+            // Sort by distance (closest first)
+            dotDistances.sort((a, b) => a.distance - b.distance);
+            
+            // Check if any dot is within hit radius
+            for (const dotInfo of dotDistances) {
+                if (dotInfo.distance < dotInfo.hitRadius) {
+                    console.log(`Hit dot ${dotInfo.index} at distance ${dotInfo.distance}`);
+                    return dotInfo.index;
                 }
             }
+            
             return -1; // No dot hovered
         }
         
@@ -983,11 +1010,16 @@
         // Mouse move event handler
         canvas.addEventListener('mousemove', (e) => {
             const rect = canvas.getBoundingClientRect();
-            // Calculate position within canvas, accounting for CSS scaling
-            const mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
-            const mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
             
-            const hoveredDotIndex = checkDotHover(mouseX, mouseY);
+            // Get mouse position in canvas coordinates
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            // Convert to canvas coordinates
+            const canvasX = mouseX * (canvas.width / rect.width);
+            const canvasY = mouseY * (canvas.height / rect.height);
+            
+            const hoveredDotIndex = checkDotHover(canvasX, canvasY);
             
             if (hoveredDotIndex >= 0) {
                 canvas.style.cursor = 'pointer';
@@ -1006,11 +1038,19 @@
         // Click event handler for opening tweet
         canvas.addEventListener('click', (e) => {
             const rect = canvas.getBoundingClientRect();
-            // Calculate position within canvas, accounting for CSS scaling
-            const mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
-            const mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
             
-            const hoveredDotIndex = checkDotHover(mouseX, mouseY);
+            // Get mouse position in canvas coordinates
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            // Convert to canvas coordinates
+            const canvasX = mouseX * (canvas.width / rect.width);
+            const canvasY = mouseY * (canvas.height / rect.height);
+            
+            console.log(`Click at: ${canvasX}, ${canvasY}`);
+            console.log(`Dots:`, coloredDots.map(d => ({ x: d.x, y: d.y, size: d.size })));
+            
+            const hoveredDotIndex = checkDotHover(canvasX, canvasY);
             
             if (hoveredDotIndex >= 0) {
                 // Get tweet data for this dot
@@ -1038,11 +1078,15 @@
                 lastTouchY = touch.clientY;
                 touchStartTime = Date.now(); // Record touch start time
                 
-                // Calculate position within canvas, accounting for CSS scaling
-                const touchX = (touch.clientX - rect.left) * (canvas.width / rect.width);
-                const touchY = (touch.clientY - rect.top) * (canvas.height / rect.height);
+                // Get touch position in canvas coordinates
+                const touchX = touch.clientX - rect.left;
+                const touchY = touch.clientY - rect.top;
                 
-                const touchedDotIndex = checkDotHover(touchX, touchY);
+                // Convert to canvas coordinates
+                const canvasX = touchX * (canvas.width / rect.width);
+                const canvasY = touchY * (canvas.height / rect.height);
+                
+                const touchedDotIndex = checkDotHover(canvasX, canvasY);
                 
                 if (touchedDotIndex >= 0) {
                     // Show popup on touch
