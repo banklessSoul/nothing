@@ -81,5 +81,29 @@
         "link": "https://x.com/0xpodi/status/1912233746226639256"
       }
     ]
+  },
+  {
+    "user": 5,
+    "name": "Nous Research",
+    "image": "https://pbs.twimg.com/profile_images/1816254738234761216/TX7TW-Mp_400x400.jpg",
+    "theory": [
+      {
+        "name": "GOD & S8N",
+        "image": "/shaded-god-satan.webp",
+        "link": "https://sims.nousresearch.com/"
+      }
+    ]
+  },
+  {
+    "user": 6,
+    "name": "UnknownCollector",
+    "image": "https://pbs.twimg.com/profile_images/1882736871299551232/YE8hiBUm_400x400.jpg",
+    "theory": [
+      {
+        "name": "A wild theory",
+        "image": "https://pbs.twimg.com/media/Gq72PEpXsAAPyHF?format=jpg&name=small",
+        "link": "https://x.com/UnknownCo123/status/1922744838522536343"
+      }
+    ]
   }
 ]
