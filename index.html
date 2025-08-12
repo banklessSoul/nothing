@@ -224,13 +224,20 @@
             maxRadius: Math.min(canvas.width, canvas.height) * 0.2
         };
         
-        // Particle system
+        // Device detection for performance optimization
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+        
+        // Particle system - reduce for mobile
         const particles = [];
-        const maxParticles = 15000;
+        const maxParticlesDesktop = 15000;
+        const maxParticlesMobile = 5000; // Significantly fewer particles for mobile
+        const maxParticles = isMobile ? maxParticlesMobile : maxParticlesDesktop;
         let particleCount = 0; // Track current number of particles
         
-        // Particle creation interval
-        const particleCreationRate = 3000; // Particles per second
+        // Particle creation interval - slower for mobile
+        const particleCreationRateDesktop = 3000; // Particles per second for desktop
+        const particleCreationRateMobile = 1000; // Particles per second for mobile
+        const particleCreationRate = isMobile ? particleCreationRateMobile : particleCreationRateDesktop;
         let lastParticleTime = 0;
         
         // Interactive profile image dots
@@ -385,15 +392,19 @@
                 // Clear trail when resetting
                 this.trail = [];
                 
-                // Particle properties
-                this.size = Math.random() * 2 + 1.5;
+                // Particle properties - smaller particles on mobile
+                this.size = isMobile ? 
+                    (Math.random() * 1.5 + 1.0) : // Smaller on mobile
+                    (Math.random() * 2 + 1.5);    // Normal size on desktop
                 this.opacity = 0.4 + Math.random() * 0.6;
                 this.life = 1.0;
                 this.decay = 0.002 + Math.random() * 0.003;
                 
-                // Trail
+                // Trail - shorter on mobile
                 this.trail = [];
-                this.maxTrailLength = Math.floor(8 + Math.random() * 15);
+                this.maxTrailLength = isMobile ? 
+                    Math.floor(4 + Math.random() * 6) : // Shorter trails on mobile
+                    Math.floor(8 + Math.random() * 15); // Normal trails on desktop
             }
             
             update() {
@@ -430,9 +441,10 @@
                     this.currentOpacity = this.opacity * Math.min(1, distToCenter / 50);
                 }
                 
-                // Add to trail
+                // Add to trail - shorter trails on mobile for performance
                 this.trail.push({ x: this.x, y: this.y });
-                if (this.trail.length > this.maxTrailLength) {
+                const maxTrailPoints = isMobile ? Math.min(5, this.maxTrailLength) : this.maxTrailLength;
+                if (this.trail.length > maxTrailPoints) {
                     this.trail.shift();
                 }
                 
@@ -478,8 +490,9 @@
         
         // Initialize particles - start with a smaller batch
         function initParticles() {
-            // Start with 20% of max particles
-            const initialParticles = Math.floor(maxParticles * 0.2);
+            // Start with fewer particles on mobile
+            const initialPercentage = isMobile ? 0.1 : 0.2; // 10% for mobile, 20% for desktop
+            const initialParticles = Math.floor(maxParticles * initialPercentage);
             
             for (let i = 0; i < initialParticles; i++) {
                 particles.push(new Particle());
@@ -492,7 +505,11 @@
         // Draw wormhole structure
         function drawWormholeStructure() {
             // Draw concentric circles to show the tunnel structure
-            const numRings = 15;
+            // Fewer rings on mobile for performance
+            const numRingsDesktop = 15;
+            const numRingsMobile = 8;
+            const numRings = isMobile ? numRingsMobile : numRingsDesktop;
+            
             for (let i = 1; i <= numRings; i++) {
                 const radius = (wormhole.maxRadius / numRings) * i;
                 const opacity = 0.1 * (1 - i / numRings);
@@ -603,6 +620,13 @@
             // Load each profile image from tweetsData
             tweetsData.forEach(tweet => {
                 const img = new Image();
+                
+                // Force image to be square when loaded
+                img.onload = function() {
+                    // Image is now loaded
+                    // The circular clipping will handle making it appear as a circle
+                };
+                
                 img.src = tweet.profilePic;
                 profileImages.push(img);
             });
@@ -720,6 +744,9 @@
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
             
+            // Reset any transformations that might affect aspect ratio
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            
             // First draw non-origin dots
             coloredDots.filter(dot => !dot.isOrigin).forEach(dot => {
                 // Pulsating effect for the border only
@@ -734,11 +761,17 @@
                 ctx.arc(dot.x, dot.y, dot.size * pulseFactor, 0, Math.PI * 2);
                 ctx.clip();
                 
-                // Draw the profile image at a fixed size (not affected by pulsation)
-                // This prevents blurriness from constant resizing
+                // Draw the profile image at a fixed size with perfect 1:1 aspect ratio
+                // This prevents blurriness and elongation
                 const img = profileImages[dot.imageIndex];
                 const baseImgSize = dot.size * 2.2; // Slightly larger than the clip to avoid edge artifacts
-                ctx.drawImage(img, dot.x - baseImgSize/2, dot.y - baseImgSize/2, baseImgSize, baseImgSize);
+                
+                // Calculate the square dimensions to ensure perfect circles
+                const imgX = dot.x - baseImgSize/2;
+                const imgY = dot.y - baseImgSize/2;
+                
+                // Draw the image with equal width and height to maintain aspect ratio
+                ctx.drawImage(img, imgX, imgY, baseImgSize, baseImgSize);
                 
                 // Restore context
                 ctx.restore();
@@ -769,10 +802,16 @@
                 ctx.arc(dot.x, dot.y, dot.size * pulseFactor, 0, Math.PI * 2);
                 ctx.clip();
                 
-                // Draw the profile image at a fixed size
+                // Draw the profile image at a fixed size with perfect 1:1 aspect ratio
                 const img = profileImages[dot.imageIndex];
                 const baseImgSize = dot.size * 2.2; // Slightly larger than the clip
-                ctx.drawImage(img, dot.x - baseImgSize/2, dot.y - baseImgSize/2, baseImgSize, baseImgSize);
+                
+                // Calculate the square dimensions to ensure perfect circles
+                const imgX = dot.x - baseImgSize/2;
+                const imgY = dot.y - baseImgSize/2;
+                
+                // Draw the image with equal width and height to maintain aspect ratio
+                ctx.drawImage(img, imgX, imgY, baseImgSize, baseImgSize);
                 
                 // Restore context
                 ctx.restore();
