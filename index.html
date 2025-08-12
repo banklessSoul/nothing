@@ -475,12 +475,6 @@
                             // Show the Enter dialog after the fade-out animation completes
                             setTimeout(function() {
                                 enterDialog.style.display = 'block';
-                                
-                                // Add click event to Enter text for page redirection
-                                const ceonecpt = document.getElementById('concept');
-                                ceonecpt.addEventListener('click', function() {
-                                    window.location.href = '/nothing.html';
-                                });
 
                                 const lore = document.getElementById('lore');
                                 lore.addEventListener('click', function() {
@@ -506,7 +500,6 @@
     </script>
     <!-- Enter dialog that appears after posting -->
     <div class="enter-dialog" id="enterDialog">
-        <div class="enter-text" id="concept">Nothing</div>
         <div class="enter-text" id="lore">Lore</div>
         <div id="nous">God & S8N</div>
         <div class="enter-text" id="join">𒐪</div>
