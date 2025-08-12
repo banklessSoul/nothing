@@ -17,6 +17,38 @@
             font-family: Arial, sans-serif;
         }
         
+        .breadcrumb {
+            padding: 15px;
+            font-size: 18px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            background-color: transparent;
+        }
+        
+        .breadcrumb a {
+            color: #fff;
+            text-decoration: none;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+        
+        .breadcrumb a:hover {
+            opacity: 1;
+        }
+        
+        .breadcrumb .separator {
+            margin: 0 8px;
+            opacity: 0.5;
+        }
+        
+        .breadcrumb .current {
+            opacity: 1;
+        }
+        
         canvas {
             border: none;
             width: 100%;
@@ -210,6 +242,9 @@
     </style>
 </head>
 <body>
+    <div class="breadcrumb">
+        <a href="lore.html">𒐪</a>
+    </div>
     <div class="info"> ︎ ︎</div>
     <canvas id="blackHoleCanvas"></canvas>
     <div class="footer-area"></div>
