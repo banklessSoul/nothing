@@ -22,6 +22,13 @@
             position: relative;
             overflow: hidden;
         }
+
+        #nous {
+            color: rgb(0 113 170 / var(--tw-text-opacity, 1));
+            font-size: 45px;
+            font-family: var(--font-franklin);
+            cursor: pointer;
+        }
         
         .dialog-container {
             width: 600px;
@@ -247,6 +254,7 @@
             animation: glow 1.5s ease-in-out infinite alternate;
             text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
             transition: transform 0.2s ease;
+            margin-bottom: 3%;
         }
         
         .enter-text:hover {
@@ -469,9 +477,19 @@
                                 enterDialog.style.display = 'block';
                                 
                                 // Add click event to Enter text for page redirection
-                                const enterText = document.getElementById('enterText');
-                                enterText.addEventListener('click', function() {
+                                const ceonecpt = document.getElementById('concept');
+                                ceonecpt.addEventListener('click', function() {
                                     window.location.href = '/nothing/nothing.html';
+                                });
+
+                                const nous = document.getElementById('nous');
+                                nous.addEventListener('click', function() {
+                                    window.location.href = 'https://sims.nousresearch.com/';
+                                });
+
+                                const joinC = document.getElementById('join');
+                                joinC.addEventListener('click', function() {
+                                    window.location.href = 'https://www.shl0ms.com/---';
                                 });
                             }, 1000);
                         }, 500);
@@ -483,7 +501,9 @@
     </script>
     <!-- Enter dialog that appears after posting -->
     <div class="enter-dialog" id="enterDialog">
-        <div class="enter-text" id="enterText">𒐪</div>
+        <div class="enter-text" id="concept">Nothing</div>
+        <div id="nous">God & S8N</div>
+        <div class="enter-text" id="join">𒐪 Replicate 𒐪</div>
     </div>
     <!-- Cursor element for click animation -->
     <div class="cursor" id="cursor"></div>
