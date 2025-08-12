@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> ︎ ︎</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        
+        canvas {
+            border: none;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #666;
+            font-size: 14px;
+            z-index: 10;
+        }
+        
+        /* Tweet popup styles */
+        .tweet-popup {
+            position: absolute;
+            background-color: rgba(20, 20, 20, 0.9);
+            border-radius: 10px;
+            padding: 15px;
+            max-width: 400px;
+            width: calc(100% - 40px); /* Responsive width */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            color: #eee;
+            font-size: 14px;
+            line-height: 1.4;
+            z-index: 100;
+            display: none;
+            border: 1px solid #333;
+            transition: background-color 0.2s ease;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .tweet-popup {
+                max-width: 300px;
+                padding: 10px;
+            }
+            
+            .social-logo {
+                width: 28px; /* Even smaller on mobile */
+                height: 28px; /* Even smaller on mobile */
+            }
+            
+            .logo-container {
+                gap: 30px; /* Smaller gap on mobile */
+            }
+        }
+        
+        .tweet-popup .tweet-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .tweet-popup .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .tweet-popup .user-info {
+            flex-grow: 1;
+        }
+        
+        .tweet-popup .name {
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+        
+        .tweet-popup .username {
+            color: #999;
+        }
+        
+        .tweet-popup .content {
+            margin-bottom: 10px;
+        }
+        
+        .tweet-popup .timestamp {
+            color: #999;
+            font-size: 12px;
+        }
+        
+        .tweet-popup .twitter-logo {
+            width: 20px;
+            height: 20px;
+            margin-left: auto;
+        }
+        
+        /* Social links at bottom */
+        .social-logo {
+            position: fixed;
+            bottom: 20px;
+            width: 36px; /* Slightly smaller logos */
+            height: 36px; /* Slightly smaller logos */
+            z-index: 50;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+        }
+        
+        /* Footer area - keep this space clear */
+        .footer-area {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px; /* Height of the footer area to keep clear */
+            z-index: 40;
+            pointer-events: none; /* Allow clicks to pass through */
+        }
+        
+        .social-logo:hover {
+            opacity: 1;
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
+        }
+        
+        /* Container for logos to ensure they're centered as a group */
+        .logo-container {
+            position: fixed;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px; /* Space between logos */
+            z-index: 50;
+        }
+        
+        .social-logo {
+            position: relative; /* Override fixed positioning */
+            bottom: auto; /* Override bottom positioning */
+            left: auto; /* Override left positioning */
+            transform: none; /* Override transform */
+        }
+        
+        .social-logo:hover {
+            transform: scale(1.1); /* Simplified hover effect */
+        }
+    </style>
+</head>
+<body>
+    <div class="info"> ︎ ︎</div>
+    <canvas id="blackHoleCanvas"></canvas>
+    <div class="footer-area"></div>
+    
+    <!-- Social links in a centered container -->
+    <div class="logo-container">
+        <a href="https://x.com/i/communities/1847401123151564807" target="_blank" class="social-logo x-logo">
+            <svg viewBox="0 0 24 24" fill="#ffffff">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+        </a>
+        
+        <a href="https://dexscreener.com/solana/a4wp7fqicqztidakcxvdnzycuzjjcabyjdca7wmoqa1g" target="_blank" class="social-logo dex-logo">
+            <svg viewBox="0 0 252 252" fill="#ffffff"><path d="M151.818 106.866c9.177-4.576 20.854-11.312 32.545-20.541 2.465 5.119 2.735 9.586 1.465 13.193-.9 2.542-2.596 4.753-4.826 6.512-2.415 1.901-5.431 3.285-8.765 4.033-6.326 1.425-13.712.593-20.419-3.197m1.591 46.886l12.148 7.017c-24.804 13.902-31.547 39.716-39.557 64.859-8.009-25.143-14.753-50.957-39.556-64.859l12.148-7.017a5.95 5.95 0 003.84-5.845c-1.113-23.547 5.245-33.96 13.821-40.498 3.076-2.342 6.434-3.518 9.747-3.518s6.671 1.176 9.748 3.518c8.576 6.538 14.934 16.951 13.821 40.498a5.95 5.95 0 003.84 5.845zM126 0c14.042.377 28.119 3.103 40.336 8.406 8.46 3.677 16.354 8.534 23.502 14.342 3.228 2.622 5.886 5.155 8.814 8.071 7.897.273 19.438-8.5 24.796-16.709-9.221 30.23-51.299 65.929-80.43 79.589-.012-.005-.02-.012-.029-.018-5.228-3.992-11.108-5.988-16.989-5.988s-11.76 1.996-16.988 5.988c-.009.005-.017.014-.029.018-29.132-13.66-71.209-49.359-80.43-79.589 5.357 8.209 16.898 16.982 24.795 16.709 2.929-2.915 5.587-5.449 8.814-8.071C69.31 16.94 77.204 12.083 85.664 8.406 97.882 3.103 111.959.377 126 0m-25.818 106.866c-9.176-4.576-20.854-11.312-32.544-20.541-2.465 5.119-2.735 9.586-1.466 13.193.901 2.542 2.597 4.753 4.826 6.512 2.416 1.901 5.432 3.285 8.766 4.033 6.326 1.425 13.711.593 20.418-3.197"></path><path d="M197.167 75.016c6.436-6.495 12.107-13.684 16.667-20.099l2.316 4.359c7.456 14.917 11.33 29.774 11.33 46.494l-.016 26.532.14 13.754c.54 33.766 7.846 67.929 24.396 99.193l-34.627-27.922-24.501 39.759-25.74-24.231L126 299.604l-41.132-66.748-25.739 24.231-24.501-39.759L0 245.25c16.55-31.264 23.856-65.427 24.397-99.193l.14-13.754-.016-26.532c0-16.721 3.873-31.578 11.331-46.494l2.315-4.359c4.56 6.415 10.23 13.603 16.667 20.099l-2.01 4.175c-3.905 8.109-5.198 17.176-2.156 25.799 1.961 5.554 5.54 10.317 10.154 13.953 4.48 3.531 9.782 5.911 15.333 7.161 3.616.814 7.3 1.149 10.96 1.035-.854 4.841-1.227 9.862-1.251 14.978L53.2 160.984l25.206 14.129a41.926 41.926 0 015.734 3.869c20.781 18.658 33.275 73.855 41.861 100.816 8.587-26.961 21.08-82.158 41.862-100.816a41.865 41.865 0 015.734-3.869l25.206-14.129-32.665-18.866c-.024-5.116-.397-10.137-1.251-14.978 3.66.114 7.344-.221 10.96-1.035 5.551-1.25 10.854-3.63 15.333-7.161 4.613-3.636 8.193-8.399 10.153-13.953 3.043-8.623 1.749-17.689-2.155-25.799l-2.01-4.175z"></path></svg>
+        </a>
+    </div>
+    
+    <!-- Tweet popup container - empty structure that will be populated dynamically -->
+    <div class="tweet-popup" id="tweetPopup">
+        <div class="tweet-header">
+            <img class="profile-pic" id="tweetProfilePic" src="" alt="Profile Picture">
+            <div class="user-info">
+                <div class="name" id="tweetName"></div>
+                <div class="username" id="tweetUsername"></div>
+            </div>
+        </div>
+        <div class="content" id="tweetContent"></div>
+        <div class="timestamp" id="tweetTimestamp"></div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('blackHoleCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas size
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Wormhole properties
+        const wormhole = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            radius: 10,
+            maxRadius: Math.min(canvas.width, canvas.height) * 0.2
+        };
+        
+        // Device detection for performance optimization
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+        
+        // Particle system - reduce for mobile
+        const particles = [];
+        const maxParticlesDesktop = 15000;
+        const maxParticlesMobile = 5000; // Significantly fewer particles for mobile
+        const maxParticles = isMobile ? maxParticlesMobile : maxParticlesDesktop;
+        let particleCount = 0; // Track current number of particles
+        
+        // Particle creation interval - slower for mobile
+        const particleCreationRateDesktop = 3000; // Particles per second for desktop
+        const particleCreationRateMobile = 1000; // Particles per second for mobile
+        const particleCreationRate = isMobile ? particleCreationRateMobile : particleCreationRateDesktop;
+        let lastParticleTime = 0;
+        
+        // Interactive profile image dots
+        const coloredDots = [];
+        // Number of dots equals number of tweets
+        
+        // White color for all dots
+        const dotColor = '#ffffff';
+        
+        // Tweet data array - can easily add more tweets
+        const tweetsData = [
+            {
+                id: '1324533296357888000',
+                url: 'https://x.com/SHL0MS/status/1324533296357888000',
+                content: " ︎ ︎",
+                author: '𒐪',
+                username: '@SHL0MS',
+                timestamp: 'Nov 5, 2020',
+                type: 'origin',
+                profilePic: 'https://pbs.twimg.com/profile_images/1920126904994082816/EBFBcYtO_400x400.png'
+            },
+            {
+                id: '1854947335651872886',
+                url: 'https://x.com/god/status/1854947335651872886',
+                content: "︎ ︎ ︎",
+                author: 'God',
+                username: '@god',
+                timestamp: 'Nov 8, 2024',
+                profilePic: 'https://pbs.twimg.com/profile_images/1880403110893400065/iMwI-2m-_400x400.jpg'
+            },
+            {
+                id: '1864346641110601786',
+                url: 'https://x.com/s8n/status/1864346641110601786',
+                content: "︎ ︎ ︎",
+                author: 'Satan',
+                username: '@s8n',
+                timestamp: 'Dec 4, 2024',
+                profilePic: 'https://pbs.twimg.com/profile_images/1880278672222916608/xIG6V6Rn_400x400.jpg'
+            },
+            {
+                id: '1943473467090985343',
+                url: 'https://x.com/RaydiumProtocol/status/1943473467090985343',
+                content: "︎ ︎ ︎",
+                author: 'Raydium',
+                username: '@RaydiumProtocol',
+                timestamp: 'Jul 10, 2025',
+                profilePic: 'https://pbs.twimg.com/profile_images/1742621757230678016/_Av2hYEY_400x400.jpg'
+            },
+            {
+                id: '1946985883535634688',
+                url: 'https://x.com/thegreatola/status/1946985883535634688',
+                content: "︎ ︎ ︎",
+                author: 'Ola Ξlixir',
+                username: '@thegreatola',
+                timestamp: 'Jul 20, 2025',
+                profilePic: 'https://pbs.twimg.com/profile_images/1945817318388305920/hrVc8K5f_400x400.jpg'
+            },
+            {
+                id: '1947213250682101783',
+                url: 'https://x.com/user0000O0/status/1947213250682101783',
+                content: "︎ ︎ ︎",
+                author: '&rlm;',
+                username: '@user0000O0',
+                timestamp: 'Jul 21, 2025',
+                profilePic: 'https://pbs.twimg.com/profile_images/1842335199184515072/Ll2z_0VH_400x400.jpg'
+            },
+            {
+                id: '1500876602569232384',
+                url: 'https://x.com/slvppy/status/1500876602569232384',
+                content: "︎ ︎ ︎",
+                author: 'Slap',
+                username: '@slvppy',
+                timestamp: 'July 23, 2024',
+                profilePic: 'https://pbs.twimg.com/profile_images/1478227815333969920/4lTpR0An_400x400.jpg'
+            },
+            {
+                id: '1953264656803365256',
+                url: 'https://x.com/PleasrDAO/status/1953264656803365256',
+                content: "︎ ︎ ︎",
+                author: 'Pleasr',
+                username: '@PleasrDAO',
+                timestamp: 'Aug 6, 2025',
+                profilePic: 'https://pbs.twimg.com/profile_images/1893093825473613824/yYqAO0Nl_400x400.jpg'
+            },
+            {
+                id: '1907162255336366243',
+                url: 'https://x.com/cb_doge/status/1907162255336366243',
+                content: "︎ ︎ ︎",
+                author: 'DogeDesigner',
+                username: '@cb_doge',
+                timestamp: 'Apr 1, 2025',
+                profilePic: 'https://pbs.twimg.com/profile_images/1498070100393754625/C2V-fbll_400x400.jpg'
+            },
+            {
+                id: '1946256901878259764',
+                url: 'https://x.com/VorosTwins/status/1946256901878259764',
+                content: "︎ ︎ ︎",
+                author: 'DA VINKI',
+                username: '@VorosTwins',
+                timestamp: 'Jul 18, 2025',
+                profilePic: 'https://pbs.twimg.com/profile_images/1484161306512920576/PE8QqPge_400x400.jpg'
+            },
+            {
+                id: '1940773250520527129',
+                url: 'https://x.com/LostMemeArchive/status/1940773250520527129',
+                content: "︎ ︎ ︎",
+                author: 'Lost Meme Archive',
+                username: '@LostMemeArchive',
+                timestamp: 'Jul 3, 2025',
+                profilePic: 'https://pbs.twimg.com/profile_images/1914120748567785472/ffFpNobt_400x400.png'
+            },
+            {
+                id: '1953923375010918403',
+                url: 'https://x.com/Cyb4rAnG3L/status/1953923375010918403',
+                content: "︎ ︎ ︎",
+                author: '🐈‍⬛',
+                username: '@Cyb4rAnG3L',
+                timestamp: 'Aug 8, 2025',
+                profilePic: 'https://pbs.twimg.com/profile_images/1938321133884813312/BU8hdbr__400x400.jpg'
+            }
+        ];
+        
+        // Animation speed control - slowed down by 2x
+        const speedFactor = 0.15; // Original was 0.3, now half speed
+        
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+            
+            reset() {
+                // Randomly distribute particles across the entire screen
+                this.x = Math.random() * canvas.width*1.5;
+                this.y = Math.random() * canvas.height*1.5;
+                
+                // Calculate angle and distance from center
+                const dx = this.x - wormhole.x;
+                const dy = this.y - wormhole.y;
+                this.angle = Math.atan2(dy, dx);
+                this.distance = Math.sqrt(dx * dx + dy * dy);
+                
+                // Velocity toward center with slight spiral
+                // Speed depends on distance - farther particles move faster initially
+                const speed = 0.3 + Math.random() * 1.0 + (this.distance / canvas.width) * 2;
+                const spiralSpeed = 0.01 + Math.random() * 0.02;
+                
+                // Direction toward center
+                this.vx = (wormhole.x - this.x) / this.distance * speed;
+                this.vy = (wormhole.y - this.y) / this.distance * speed;
+                this.spiralSpeed = spiralSpeed;
+                
+                // Clear trail when resetting
+                this.trail = [];
+                
+                // Particle properties - smaller particles on mobile
+                this.size = isMobile ? 
+                    (Math.random() * 1.5 + 1.0) : // Smaller on mobile
+                    (Math.random() * 2 + 1.5);    // Normal size on desktop
+                this.opacity = 0.4 + Math.random() * 0.6;
+                this.life = 1.0;
+                this.decay = 0.002 + Math.random() * 0.003;
+                
+                // Trail - shorter on mobile
+                this.trail = [];
+                this.maxTrailLength = isMobile ? 
+                    Math.floor(4 + Math.random() * 6) : // Shorter trails on mobile
+                    Math.floor(8 + Math.random() * 15); // Normal trails on desktop
+            }
+            
+            update() {
+                // Calculate distance to center
+                const dx = wormhole.x - this.x;
+                const dy = wormhole.y - this.y;
+                const distToCenter = Math.sqrt(dx * dx + dy * dy);
+                
+                // Apply spiral motion
+                this.angle += this.spiralSpeed;
+                
+                // Move toward center with increasing speed as it gets closer
+                const pullStrength = Math.max(0.1, 200 / Math.max(10, distToCenter));
+                this.vx += (dx / distToCenter) * pullStrength * 0.02;
+                this.vy += (dy / distToCenter) * pullStrength * 0.02;
+                
+                // Add spiral component
+                this.vx += Math.cos(this.angle + Math.PI / 2) * 0.3;
+                this.vy += Math.sin(this.angle + Math.PI / 2) * 0.3;
+                
+                // Update position
+                this.x += this.vx * speedFactor;
+                this.y += this.vy * speedFactor;
+                
+                // Scale size based on distance to center (perspective effect)
+                const sizeFactor = Math.max(0.1, Math.min(1, distToCenter / wormhole.maxRadius));
+                this.currentSize = this.size * sizeFactor;
+                
+                // Adjust opacity based on distance - fade out as it approaches center
+                if (distToCenter < wormhole.radius * 15) {
+                    // Fade out as it gets very close to center
+                    this.currentOpacity = this.opacity * (distToCenter / (wormhole.radius * 15));
+                } else {
+                    this.currentOpacity = this.opacity * Math.min(1, distToCenter / 50);
+                }
+                
+                // Add to trail - shorter trails on mobile for performance
+                this.trail.push({ x: this.x, y: this.y });
+                const maxTrailPoints = isMobile ? Math.min(5, this.maxTrailLength) : this.maxTrailLength;
+                if (this.trail.length > maxTrailPoints) {
+                    this.trail.shift();
+                }
+                
+                // Age particle
+                this.life -= this.decay;
+                
+                // When particles reach the center or die, remove them
+                if (distToCenter < wormhole.radius || this.life <= 0) {
+                    return false; // Signal to remove this particle
+                }
+                
+                // Reset if outside screen bounds
+                if (this.x < -50 || this.x > canvas.width *2 || 
+                    this.y < -50 || this.y > canvas.height *2) {
+                    this.reset();
+                }
+                
+                return true; // Keep this particle
+            }
+            
+            draw() {
+                // Draw trail
+                if (this.trail.length > 1) {
+                    ctx.strokeStyle = `rgba(150, 150, 150, ${this.currentOpacity * 0.4 * this.life})`;
+                    ctx.lineWidth = Math.max(0.5, this.currentSize * 0.3);
+                    ctx.beginPath();
+                    ctx.moveTo(this.trail[0].x, this.trail[0].y);
+                    
+                    for (let i = 1; i < this.trail.length; i++) {
+                        ctx.lineTo(this.trail[i].x, this.trail[i].y);
+                    }
+                    
+                    ctx.stroke();
+                }
+                
+                // Draw particle
+                ctx.fillStyle = `rgba(180, 180, 180, ${this.currentOpacity * this.life})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.currentSize * this.life, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        // Initialize particles - start with a smaller batch
+        function initParticles() {
+            // Start with fewer particles on mobile
+            const initialPercentage = isMobile ? 0.1 : 0.2; // 10% for mobile, 20% for desktop
+            const initialParticles = Math.floor(maxParticles * initialPercentage);
+            
+            for (let i = 0; i < initialParticles; i++) {
+                particles.push(new Particle());
+            }
+            
+            particleCount = initialParticles;
+            lastParticleTime = performance.now();
+        }
+        
+        // Draw wormhole structure
+        function drawWormholeStructure() {
+            // Draw concentric circles to show the tunnel structure
+            // Fewer rings on mobile for performance
+            const numRingsDesktop = 15;
+            const numRingsMobile = 8;
+            const numRings = isMobile ? numRingsMobile : numRingsDesktop;
+            
+            for (let i = 1; i <= numRings; i++) {
+                const radius = (wormhole.maxRadius / numRings) * i;
+                const opacity = 0.1 * (1 - i / numRings);
+                
+                ctx.strokeStyle = `rgba(120, 120, 120, ${opacity})`;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.arc(wormhole.x, wormhole.y, radius, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        }
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            
+            // Update wormhole properties
+            wormhole.x = canvas.width / 2;
+            wormhole.y = canvas.height / 2;
+            wormhole.maxRadius = Math.min(canvas.width, canvas.height) * 0.4;
+            
+            // Update position of origin dots
+            coloredDots.forEach(dot => {
+                if (dot.isOrigin) {
+                    dot.x = wormhole.x;
+                    dot.y = wormhole.y;
+                }
+            });
+        });
+        
+        // Create new particles at regular intervals
+        function addNewParticles(currentTime) {
+            // Calculate time since last particle creation
+            const deltaTime = currentTime - lastParticleTime;
+            
+            // Calculate how many particles to add based on time passed
+            const particlesToAdd = Math.floor(particleCreationRate * deltaTime / 1000);
+            
+            if (particlesToAdd > 0) {
+                // Add new particles
+                for (let i = 0; i < particlesToAdd; i++) {
+                    if (particleCount < maxParticles) {
+                        const particle = new Particle();
+                        particles.push(particle);
+                        particleCount++;
+                    }
+                }
+                
+                // Update last particle time
+                lastParticleTime = currentTime;
+            }
+        }
+        
+        // Animation loop
+        function animate(currentTime) {
+            // Add new particles at regular intervals
+            addNewParticles(currentTime);
+            
+            // Clear canvas with black background
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Keep wormhole centered
+            wormhole.x = canvas.width / 2;
+            wormhole.y = canvas.height / 2;
+            
+            // Draw wormhole structure
+            drawWormholeStructure();
+            
+            // Draw wormhole center (dark void)
+            const centerGradient = ctx.createRadialGradient(
+                wormhole.x, wormhole.y, 0,
+                wormhole.x, wormhole.y, wormhole.radius * 2
+            );
+            centerGradient.addColorStop(0, '#000');
+            centerGradient.addColorStop(0.8, '#000');
+            centerGradient.addColorStop(1, 'rgba(0, 0, 0, 0.5)');
+            
+            ctx.fillStyle = centerGradient;
+            ctx.beginPath();
+            ctx.arc(wormhole.x, wormhole.y, wormhole.radius * 2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Update and draw particles, remove dead ones
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const isAlive = particles[i].update();
+                
+                if (isAlive) {
+                    particles[i].draw();
+                } else {
+                    // Remove dead particle
+                    particles.splice(i, 1);
+                    particleCount--;
+                }
+            }
+            
+            // Draw interactive colored dots
+            drawColoredDots();
+            
+            // Continue animation
+            requestAnimationFrame(animate);
+        }
+        
+        // Load profile images
+        const profileImages = [];
+        
+        function loadProfileImages() {
+            // Load each profile image from tweetsData
+            tweetsData.forEach(tweet => {
+                const img = new Image();
+                
+                // Force image to be square when loaded
+                img.onload = function() {
+                    // Image is now loaded
+                    // The circular clipping will handle making it appear as a circle
+                };
+                
+                img.src = tweet.profilePic;
+                profileImages.push(img);
+            });
+        }
+        
+        // Create interactive profile image dots - one for each tweet
+        function createColoredDots() {
+            // Clear existing dots
+            coloredDots.length = 0;
+            
+            // First, find the origin position (center of wormhole)
+            const originX = wormhole.x;
+            const originY = wormhole.y;
+            const minDistanceFromOrigin = 150; // Minimum distance from origin in pixels
+            
+            // Determine base size based on screen size
+            const isMobile = window.innerWidth < 768;
+            const baseSizeDesktop = 18;
+            const baseSizeMobile = 14; // Smaller on mobile
+            const baseSize = isMobile ? baseSizeMobile : baseSizeDesktop;
+            
+            // Create one dot for each tweet in tweetsData
+            for (let i = 0; i < tweetsData.length; i++) {
+                const tweet = tweetsData[i];
+                let x, y, size;
+                
+                // Use consistent sizes without randomness
+                const dotSize = baseSize; // Fixed size for consistency
+                
+                if (tweet.type === 'origin') {
+                    // Position origin tweet at the center of the wormhole
+                    x = originX;
+                    y = originY;
+                    size = baseSize * 1.7; // Origin is 1.7x larger than base size (not dotSize)
+                } else {
+                    // For non-origin tweets, use a grid-based approach to better utilize screen space
+                    let isValidPosition = false;
+                    let attempts = 0;
+                    const maxAttempts = 50; // Fewer attempts needed with grid approach
+                    
+                    // Define margins
+                    const horizontalMargin = Math.max(80, canvas.width * 0.08); // Slightly smaller margins
+                    const topMargin = Math.max(isMobile ? 150 : 80, canvas.height * 0.12); // Increased top margin on mobile
+                    const footerMargin = 150; // Increased footer margin to keep circles away from logos
+                    
+                    // Calculate available space for grid
+                    const availableWidth = canvas.width - 2 * horizontalMargin;
+                    const availableHeight = canvas.height - topMargin - footerMargin;
+                    
+                    // Calculate grid dimensions based on number of non-origin dots
+                    const nonOriginDots = tweetsData.filter(t => !t.type || t.type !== 'origin').length;
+                    
+                    // Determine grid size - aim for roughly square cells
+                    // For mobile, use more rows than columns to utilize height
+                    let cols, rows;
+                    if (isMobile) {
+                        // On mobile, prioritize using vertical space
+                        cols = Math.ceil(Math.sqrt(nonOriginDots / 2)); // Fewer columns
+                        rows = Math.ceil(nonOriginDots / cols); // More rows
+                    } else {
+                        // On desktop, more balanced
+                        cols = Math.ceil(Math.sqrt(nonOriginDots));
+                        rows = Math.ceil(nonOriginDots / cols);
+                    }
+                    
+                    // Calculate cell size
+                    const cellWidth = availableWidth / cols;
+                    const cellHeight = availableHeight / rows;
+                    
+                    // Calculate which grid cell this dot belongs to
+                    const nonOriginIndex = coloredDots.filter(d => !d.isOrigin).length;
+                    const cellRow = Math.floor(nonOriginIndex / cols);
+                    const cellCol = nonOriginIndex % cols;
+                    
+                    // Track already placed dots to avoid overlaps
+                    const placedPositions = coloredDots.map(dot => ({
+                        x: dot.x,
+                        y: dot.y,
+                        size: dot.size
+                    }));
+                    
+                    // Calculate minimum distance between dots based on dot size
+                    const dotDiameter = dotSize * 2;
+                    const minDistanceBetweenDots = dotSize * (isMobile ? 3.0 : 3.5); // Increased for better spacing
+                    
+                    while (!isValidPosition && attempts < maxAttempts) {
+                        // Calculate base position for this grid cell
+                        const cellBaseX = horizontalMargin + cellCol * cellWidth;
+                        const cellBaseY = topMargin + cellRow * cellHeight;
+                        
+                        // Add randomness within the cell, but keep away from edges
+                        const cellPadding = Math.min(cellWidth, cellHeight) * 0.2;
+                        
+                        // Calculate position with randomness
+                        x = cellBaseX + cellPadding + Math.random() * (cellWidth - 2 * cellPadding);
+                        y = cellBaseY + cellPadding + Math.random() * (cellHeight - 2 * cellPadding);
+                        
+                        // Special case: ensure we're not too close to the origin
+                        const dxOrigin = x - originX;
+                        const dyOrigin = y - originY;
+                        const distToOrigin = Math.sqrt(dxOrigin * dxOrigin + dyOrigin * dyOrigin);
+                        
+                        // If too close to origin, push outward
+                        if (distToOrigin < minDistanceFromOrigin) {
+                            const angle = Math.atan2(dyOrigin, dxOrigin);
+                            x = originX + Math.cos(angle) * minDistanceFromOrigin;
+                            y = originY + Math.sin(angle) * minDistanceFromOrigin;
+                        }
+                        
+                        // Ensure the dot is within screen bounds
+                        x = Math.max(horizontalMargin, Math.min(canvas.width - horizontalMargin, x));
+                        y = Math.max(topMargin, Math.min(canvas.height - footerMargin, y));
+                        
+                        // Additional check to ensure we're not in the footer area
+                        if (y > canvas.height - footerMargin) {
+                            y = canvas.height - footerMargin - dotSize * 4; // Keep even further above footer
+                        }
+                        
+                        // Additional check to ensure we're not too close to the top (for popup visibility)
+                        if (y < topMargin) {
+                            y = topMargin + dotSize * 2; // Keep below top margin
+                        }
+                        
+                        // Calculate distance from origin (using the variables we already defined)
+                        // Check if position is valid (not too close to origin)
+                        let validDistance = distToOrigin > minDistanceFromOrigin;
+                        
+                        // Check for overlap with existing dots
+                        let noOverlap = true;
+                        
+                        for (let j = 0; j < placedPositions.length; j++) {
+                            const otherDot = placedPositions[j];
+                            const dxDot = x - otherDot.x;
+                            const dyDot = y - otherDot.y;
+                            const distanceBetweenDots = Math.sqrt(dxDot * dxDot + dyDot * dyDot);
+                            
+                            // If too close to another dot, mark as overlapping
+                            if (distanceBetweenDots < minDistanceBetweenDots) {
+                                noOverlap = false;
+                                break;
+                            }
+                        }
+                        
+                        // Position is valid if it's far enough from origin and doesn't overlap
+                        isValidPosition = validDistance && noOverlap;
+                        attempts++;
+                    }
+                    
+                    // Use consistent size for all non-origin dots
+                    size = baseSize;
+                }
+                
+                // Add dot with profile image
+                coloredDots.push({
+                    x: x,
+                    y: y,
+                    size: size,
+                    pulsating: 0,
+                    pulsateSpeed: 0.02 + Math.random() * 0.01,
+                    imageIndex: i, // Each dot corresponds to exactly one tweet
+                    isOrigin: tweet.type === 'origin' // Flag for special handling
+                });
+            }
+        }
+        
+        // Draw the profile image dots
+        function drawColoredDots() {
+            // Only draw if images are loaded
+            if (profileImages.length === 0) return;
+            
+            // Set image smoothing for better quality
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            
+            // Reset any transformations that might affect aspect ratio
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            
+            // First draw non-origin dots
+            coloredDots.filter(dot => !dot.isOrigin).forEach(dot => {
+                // No pulsating effect for non-origin dots
+                const pulseFactor = 1.0; // Fixed size, no pulsation
+                
+                // Save context for clipping
+                ctx.save();
+                
+                // Create circular clipping path that pulsates
+                ctx.beginPath();
+                ctx.arc(dot.x, dot.y, dot.size * pulseFactor, 0, Math.PI * 2);
+                ctx.clip();
+                
+                // Draw the profile image at a fixed size with perfect 1:1 aspect ratio
+                // This prevents blurriness and elongation
+                const img = profileImages[dot.imageIndex];
+                const baseImgSize = dot.size * 2.2; // Slightly larger than the clip to avoid edge artifacts
+                
+                // Calculate the square dimensions to ensure perfect circles
+                const imgX = dot.x - baseImgSize/2;
+                const imgY = dot.y - baseImgSize/2;
+                
+                // Force square dimensions for the image
+                const imgWidth = baseImgSize;
+                const imgHeight = baseImgSize;
+                
+                // Draw the image with equal width and height to maintain aspect ratio
+                ctx.drawImage(img, 0, 0, img.width, img.height, imgX, imgY, imgWidth, imgHeight);
+                
+                // Restore context
+                ctx.restore();
+                
+                // Add a thin white border for definition
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.arc(dot.x, dot.y, dot.size * pulseFactor, 0, Math.PI * 2);
+                ctx.stroke();
+            });
+            
+            // Then draw origin dots on top
+            coloredDots.filter(dot => dot.isOrigin).forEach(dot => {
+                // Keep origin dot at center if wormhole position changes
+                dot.x = wormhole.x;
+                dot.y = wormhole.y;
+                
+                // Stronger pulsating effect for origin (border only)
+                // Only pulsate outward, not inward
+                dot.pulsating += dot.pulsateSpeed * 1.5;
+                // Use Math.abs(Math.sin) to ensure pulsation only goes outward (1.0 to 1.2)
+                const pulseFactor = 1 + 0.2 * Math.abs(Math.sin(dot.pulsating));
+                
+                // Save context for clipping
+                ctx.save();
+                
+                // Create circular clipping path
+                ctx.beginPath();
+                ctx.arc(dot.x, dot.y, dot.size * pulseFactor, 0, Math.PI * 2);
+                ctx.clip();
+                
+                // Draw the profile image at a fixed size with perfect 1:1 aspect ratio
+                const img = profileImages[dot.imageIndex];
+                const baseImgSize = dot.size * 2.2; // Same multiplier as non-origin dots
+                
+                // Calculate the square dimensions to ensure perfect circles
+                const imgX = dot.x - baseImgSize/2;
+                const imgY = dot.y - baseImgSize/2;
+                
+                // Force square dimensions for the image
+                const imgWidth = baseImgSize;
+                const imgHeight = baseImgSize;
+                
+                // Draw the image with equal width and height to maintain aspect ratio
+                ctx.drawImage(img, 0, 0, img.width, img.height, imgX, imgY, imgWidth, imgHeight);
+                
+                // Restore context
+                ctx.restore();
+                
+                // Add a subtle radiance glow for origin that doesn't interfere with the image
+                
+                // First, draw an outer glow that starts outside the image
+                const outerGlow = ctx.createRadialGradient(
+                    dot.x, dot.y, dot.size * pulseFactor * 1.1, // Start just outside the image
+                    dot.x, dot.y, dot.size * pulseFactor * 2.5  // Extend further out
+                );
+                outerGlow.addColorStop(0, 'rgba(255, 255, 255, 0.3)'); // Increased opacity
+                outerGlow.addColorStop(0.5, 'rgba(255, 255, 255, 0.15)'); // Increased opacity
+                outerGlow.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                
+                ctx.fillStyle = outerGlow;
+                ctx.beginPath();
+                ctx.arc(dot.x, dot.y, dot.size * pulseFactor * 2.5, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Add a thin, bright ring around the image
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)'; // Increased opacity
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(dot.x, dot.y, dot.size * pulseFactor * 1.05, 0, Math.PI * 2); // Just outside the image
+                ctx.stroke();
+                
+                // Add a second, outer ring for distinction
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)'; // More visible
+                ctx.lineWidth = 0.5;
+                ctx.beginPath();
+                ctx.arc(dot.x, dot.y, dot.size * pulseFactor * 1.5, 0, Math.PI * 2);
+                ctx.stroke();
+            });
+        }
+        
+        // Check if mouse is over a colored dot
+        function checkDotHover(mouseX, mouseY) {
+            // Get the device pixel ratio to account for high-DPI displays
+            const pixelRatio = window.devicePixelRatio || 1;
+            
+            // Adjust for any scaling between CSS pixels and canvas pixels
+            const canvasRect = canvas.getBoundingClientRect();
+            
+            // Use direct ratio calculation to avoid rounding errors
+            const scaleX = canvas.width / canvasRect.width;
+            const scaleY = canvas.height / canvasRect.height;
+            
+            // Apply scaling to mouse coordinates - use the raw coordinates
+            const adjustedX = mouseX;
+            const adjustedY = mouseY;
+            
+            // Check each dot with a slightly larger hit area on mobile
+            const hitAreaMultiplier = isMobile ? 2.5 : 1.5; // Even larger hit area on mobile
+            
+            // Debug info
+            console.log(`Mouse/Touch at: ${adjustedX}, ${adjustedY}`);
+            
+            // Check all dots, but prioritize those closest to the touch point
+            const dotDistances = [];
+            
+            for (let i = 0; i < coloredDots.length; i++) {
+                const dot = coloredDots[i];
+                const dx = adjustedX - dot.x;
+                const dy = adjustedY - dot.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                // Store distance and index
+                dotDistances.push({ index: i, distance: distance, hitRadius: dot.size * hitAreaMultiplier });
+            }
+            
+            // Sort by distance (closest first)
+            dotDistances.sort((a, b) => a.distance - b.distance);
+            
+            // Check if any dot is within hit radius
+            for (const dotInfo of dotDistances) {
+                if (dotInfo.distance < dotInfo.hitRadius) {
+                    console.log(`Hit dot ${dotInfo.index} at distance ${dotInfo.distance}`);
+                    return dotInfo.index;
+                }
+            }
+            
+            return -1; // No dot hovered
+        }
+        
+        // Show tweet popup
+        function showTweetPopup(dotIndex, mouseX, mouseY) {
+            const popup = document.getElementById('tweetPopup');
+            
+            // Get tweet data for this dot
+            // Each dot corresponds to exactly one tweet
+            const tweet = tweetsData[dotIndex];
+            
+            // Populate tweet content from data
+            document.getElementById('tweetProfilePic').src = tweet.profilePic;
+            document.getElementById('tweetName').textContent = tweet.author;
+            document.getElementById('tweetUsername').textContent = tweet.username;
+            document.getElementById('tweetContent').textContent = tweet.content;
+            
+            // For mobile, add tap instructions
+            if (isMobile) {
+                document.getElementById('tweetTimestamp').textContent = tweet.timestamp + " • Tap to open";
+            } else {
+                document.getElementById('tweetTimestamp').textContent = tweet.timestamp;
+            }
+            
+            // Position popup near the dot but ensure it stays within viewport
+            const popupWidth = Math.min(400, window.innerWidth - 40); // Responsive width
+            const popupHeight = isMobile ? 200 : 180; // Slightly taller on mobile to account for "Tap to open" text
+            
+            // Get footer height to avoid overlapping
+            const footerHeight = 80; // Same as footer-area height
+            
+            let left = mouseX + 20;
+            let top = mouseY - popupHeight / 2;
+            
+            // Adjust if too close to right edge
+            if (left + popupWidth > window.innerWidth) {
+                left = Math.max(10, mouseX - popupWidth - 20);
+            }
+            
+            // Adjust if too close to top/bottom edge
+            if (top < 20) {
+                // If near top, position below the dot instead of centered
+                top = mouseY + 20;
+            }
+            if (top + popupHeight > window.innerHeight - footerHeight) {
+                // If near bottom, position above the dot
+                top = mouseY - popupHeight - 20;
+            }
+            
+            // For mobile, center horizontally if screen is narrow
+            if (window.innerWidth < 500) {
+                left = (window.innerWidth - popupWidth) / 2;
+            }
+            
+            // Set position and show popup
+            popup.style.left = left + 'px';
+            popup.style.top = top + 'px';
+            popup.style.display = 'block';
+        }
+        
+        // Hide tweet popup
+        function hideTweetPopup() {
+            const popup = document.getElementById('tweetPopup');
+            popup.style.display = 'none';
+        }
+        
+        // Mouse move event handler
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            
+            // Get mouse position in canvas coordinates
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            // Convert to canvas coordinates
+            const canvasX = mouseX * (canvas.width / rect.width);
+            const canvasY = mouseY * (canvas.height / rect.height);
+            
+            const hoveredDotIndex = checkDotHover(canvasX, canvasY);
+            
+            if (hoveredDotIndex >= 0) {
+                canvas.style.cursor = 'pointer';
+                showTweetPopup(hoveredDotIndex, e.clientX, e.clientY);
+            } else {
+                canvas.style.cursor = 'default';
+                hideTweetPopup();
+            }
+        });
+        
+        // Mouse leave event handler
+        canvas.addEventListener('mouseleave', () => {
+            hideTweetPopup();
+        });
+        
+        // Click event handler for opening tweet
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            
+            // Get mouse position in canvas coordinates
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            // Convert to canvas coordinates
+            const canvasX = mouseX * (canvas.width / rect.width);
+            const canvasY = mouseY * (canvas.height / rect.height);
+            
+            console.log(`Click at: ${canvasX}, ${canvasY}`);
+            console.log(`Dots:`, coloredDots.map(d => ({ x: d.x, y: d.y, size: d.size })));
+            
+            const hoveredDotIndex = checkDotHover(canvasX, canvasY);
+            
+            if (hoveredDotIndex >= 0) {
+                // Get tweet data for this dot
+                const tweet = tweetsData[hoveredDotIndex];
+                window.open(tweet.url, '_blank');
+            }
+        });
+        
+        // Touch events for mobile support
+        let touchTimer = null;
+        let lastTouchX = 0;
+        let lastTouchY = 0;
+        
+        // Track touch start time for tap detection
+        let touchStartTime = 0;
+        
+        // Touch start handler
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Prevent scrolling when touching the canvas
+            
+            // Hide any existing popup first
+            hideTweetPopup();
+            
+            if (e.touches.length > 0) {
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                lastTouchX = touch.clientX;
+                lastTouchY = touch.clientY;
+                touchStartTime = Date.now(); // Record touch start time
+                
+                // Get touch position in canvas coordinates
+                const touchX = touch.clientX - rect.left;
+                const touchY = touch.clientY - rect.top;
+                
+                // Convert to canvas coordinates
+                const canvasX = touchX * (canvas.width / rect.width);
+                const canvasY = touchY * (canvas.height / rect.height);
+                
+                const touchedDotIndex = checkDotHover(canvasX, canvasY);
+                
+                if (touchedDotIndex >= 0) {
+                    // Show popup on touch
+                    showTweetPopup(touchedDotIndex, touch.clientX, touch.clientY);
+                    
+                    // Store the touched dot index for use in touchend
+                    window.lastTouchedDotIndex = touchedDotIndex;
+                    
+                    // Set a timer to detect long press
+                    touchTimer = setTimeout(() => {
+                        // Long press - open the URL
+                        const tweet = tweetsData[touchedDotIndex];
+                        window.open(tweet.url, '_blank');
+                        touchTimer = null;
+                        
+                        // Show feedback that link is opening
+                        const popup = document.getElementById('tweetPopup');
+                        popup.style.backgroundColor = 'rgba(40, 40, 40, 0.9)';
+                    }, 800); // 800ms for long press
+                }
+            }
+        });
+        
+        // Touch end handler
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            
+            // Calculate touch duration
+            const touchDuration = Date.now() - touchStartTime;
+            
+            // Clear the long press timer
+            if (touchTimer) {
+                clearTimeout(touchTimer);
+                touchTimer = null;
+                
+                // If this was a short tap (< 300ms) and we have a valid dot index, open the URL
+                if (touchDuration < 300 && window.lastTouchedDotIndex !== undefined) {
+                    const tweet = tweetsData[window.lastTouchedDotIndex];
+                    window.open(tweet.url, '_blank');
+                    
+                    // Show feedback that link is opening
+                    const popup = document.getElementById('tweetPopup');
+                    popup.style.backgroundColor = 'rgba(40, 40, 40, 0.9)';
+                }
+            }
+            
+            // Reset the touched dot index
+            window.lastTouchedDotIndex = undefined;
+            
+            // Hide popup after a short delay to allow for reading
+            setTimeout(() => {
+                hideTweetPopup();
+                // Reset popup background color
+                const popup = document.getElementById('tweetPopup');
+                popup.style.backgroundColor = 'rgba(20, 20, 20, 0.9)';
+            }, 1000);
+        });
+        
+        // Touch move handler
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            
+            // If moved too far, cancel the long press
+            if (touchTimer && e.touches.length > 0) {
+                const touch = e.touches[0];
+                const dx = touch.clientX - lastTouchX;
+                const dy = touch.clientY - lastTouchY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance > 10) { // If moved more than 10px
+                    clearTimeout(touchTimer);
+                    touchTimer = null;
+                }
+            }
+        });
+        
+        
+        // Initialize
+        initParticles();
+        loadProfileImages();
+        
+        // Create dots immediately
+        createColoredDots();
+        
+        // Also ensure dots are recreated after window fully loads
+        // This helps with positioning if window size changes during load
+        window.addEventListener('load', () => {
+            // Clear existing dots
+            coloredDots.length = 0;
+            // Reset any tracking variables
+            window.occupiedSegments = null;
+            // Create new dots
+            createColoredDots();
+        });
+        
+        // Recreate dots on window resize to ensure proper positioning
+        window.addEventListener('resize', () => {
+            // Wait a short moment for resize to complete
+            setTimeout(() => {
+                // Clear existing dots
+                coloredDots.length = 0;
+                // Create new dots with updated dimensions
+                createColoredDots();
+            }, 200);
+        });
+        
+        // Start animation with timestamp
+        requestAnimationFrame(animate);
+    </script>
+</body>
+</html>
