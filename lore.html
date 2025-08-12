@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lore</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+        
+        body {
+            background-color: #000;
+            color: #fff;
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            position: relative;
+        }
+        
+        .breadcrumb {
+            padding: 15px;
+            font-size: 18px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+        }
+        
+        .breadcrumb a {
+            color: #fff;
+            text-decoration: none;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+        
+        .breadcrumb a:hover {
+            opacity: 1;
+        }
+        
+        .breadcrumb .separator {
+            margin: 0 8px;
+            opacity: 0.5;
+        }
+        
+        .breadcrumb .current {
+            opacity: 1;
+        }
+        
+        .container {
+            padding-top: 60px; /* Space for breadcrumb */
+            padding-bottom: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .mosaic {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 15px;
+        }
+        
+        .tile {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            aspect-ratio: 1 / 1;
+            cursor: pointer;
+        }
+        
+        .tile:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .tile img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s;
+        }
+        
+        .tile:hover img {
+            opacity: 0.7;
+        }
+        
+        .tile-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 15px;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+            color: #fff;
+        }
+        
+        .tile-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .tile-subtitle {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+        
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+            padding: 0;
+            margin-right: 10px;
+        }
+        
+        .back-button:hover {
+            opacity: 1;
+        }
+        
+        .back-button svg {
+            width: 16px;
+            height: 16px;
+            margin-right: 5px;
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .loading::after {
+            content: "...";
+            animation: loading-dots 1.5s infinite;
+            width: 24px;
+            text-align: left;
+        }
+        
+        @keyframes loading-dots {
+            0% { content: "."; }
+            33% { content: ".."; }
+            66% { content: "..."; }
+        }
+        
+        .error {
+            padding: 20px;
+            text-align: center;
+            color: #ff6b6b;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .mosaic {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 15px;
+                padding: 10px;
+            }
+            
+            .tile-title {
+                font-size: 16px;
+            }
+            
+            .tile-subtitle {
+                font-size: 12px;
+            }
+            
+            .breadcrumb {
+                font-size: 16px;
+                padding: 12px 15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .mosaic {
+                /* Change to vertical layout on mobile */
+                display: flex;
+                flex-direction: column;
+                grid-template-columns: none;
+                gap: 15px;
+            }
+            
+            .tile {
+                width: 100%;
+                max-width: 100%;
+                aspect-ratio: 16 / 9; /* Wider aspect ratio for vertical scrolling */
+            }
+            
+            .tile-title {
+                font-size: 14px;
+            }
+            
+            .breadcrumb {
+                font-size: 14px;
+                padding: 10px;
+            }
+        }
+        
+        /* Animation for tile appearance */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tile {
+            animation: fadeIn 0.5s ease-out forwards;
+            opacity: 0;
+        }
+        
+        /* Staggered animation delay for tiles */
+        .tile:nth-child(1) { animation-delay: 0.05s; }
+        .tile:nth-child(2) { animation-delay: 0.1s; }
+        .tile:nth-child(3) { animation-delay: 0.15s; }
+        .tile:nth-child(4) { animation-delay: 0.2s; }
+        .tile:nth-child(5) { animation-delay: 0.25s; }
+        .tile:nth-child(6) { animation-delay: 0.3s; }
+        .tile:nth-child(7) { animation-delay: 0.35s; }
+        .tile:nth-child(8) { animation-delay: 0.4s; }
+        .tile:nth-child(9) { animation-delay: 0.45s; }
+        .tile:nth-child(10) { animation-delay: 0.5s; }
+        .tile:nth-child(11) { animation-delay: 0.55s; }
+        .tile:nth-child(12) { animation-delay: 0.6s; }
+        
+        /* Transition animations for page changes */
+        .page-transition {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        
+        .page-transition.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="breadcrumb" id="breadcrumb">
+        <a href="lore.html">𒐪</a>
+    </div>
+    
+    <div class="container">
+        <div id="content" class="page-transition active">
+            <div class="loading">Loading</div>
+        </div>
+    </div>
+    
+    <!-- Hidden div to store JSON data if needed -->
+    <div id="loreData" style="display: none;">
+        <!-- JSON data can be placed here -->
+    </div>
+    
+    
+    <script>
+        // Default data structure (will be replaced with data from lore-data.json)
+        let data = {
+            users: []
+        };
+
+        // Function to parse JSON input from URL or data attribute
+        function parseJsonInput() {
+            try {
+                // Check for JSON data in URL parameter
+                const urlParams = new URLSearchParams(window.location.search);
+                const jsonData = urlParams.get('data');
+                
+                if (jsonData) {
+                    try {
+                        // Try to parse the URL parameter as JSON
+                        const parsedData = JSON.parse(decodeURIComponent(jsonData));
+                        return processInputData(parsedData);
+                    } catch (e) {
+                        console.error("Error parsing JSON from URL:", e);
+                    }
+                }
+                
+                // If no valid JSON in URL, check for a data element
+                const dataElement = document.getElementById('loreData');
+                if (dataElement && dataElement.textContent) {
+                    try {
+                        const parsedData = JSON.parse(dataElement.textContent);
+                        return processInputData(parsedData);
+                    } catch (e) {
+                        console.error("Error parsing JSON from data element:", e);
+                    }
+                }
+                
+                // Return default data if no valid JSON input found
+                return data;
+            } catch (e) {
+                console.error("Error in parseJsonInput:", e);
+                return data; // Return default data on error
+            }
+        }
+        
+        // Process the input data to match our expected format
+        function processInputData(inputData) {
+            try {
+                // Handle both array format and object format with array inside
+                let dataArray = inputData;
+                if (!Array.isArray(inputData) && inputData.hasOwnProperty('length')) {
+                    // Try to convert to array if it has a length property
+                    dataArray = Array.from({ length: inputData.length }, (_, i) => inputData[i]);
+                } else if (!Array.isArray(inputData)) {
+                    console.error("Input data is not in expected format");
+                    return data;
+                }
+                
+                const processedData = {
+                    users: []
+                };
+                
+                dataArray.forEach(item => {
+                    if (item && typeof item === 'object') {
+                        // Extract user ID and image
+                        const userId = item.user || null;
+                        const userImage = item.image || 'nous.jpeg';
+                        const userName = item.name || `User ${userId}`;
+                        
+                        if (userId !== null) {
+                            const user = {
+                                id: userId,
+                                name: userName,
+                                image: userImage,
+                                theories: []
+                            };
+                            
+                            // Process theories
+                            if (Array.isArray(item.theory)) {
+                                item.theory.forEach(theory => {
+                                    if (theory && typeof theory === 'object' && theory.name) {
+                                        user.theories.push({
+                                            name: theory.name,
+                                            image: theory.image || userImage,
+                                            link: theory.link || '#'
+                                        });
+                                    }
+                                });
+                            }
+                            
+                            processedData.users.push(user);
+                        }
+                    }
+                });
+                
+                return processedData.users.length > 0 ? processedData : data;
+            } catch (e) {
+                console.error("Error processing input data:", e);
+                return data; // Return default data on error
+            }
+        }
+        
+        // Load data from lore-data.json or use URL parameters if provided
+        async function loadData() {
+            try {
+                // First check if there's data in URL parameters
+                const urlParams = new URLSearchParams(window.location.search);
+                const jsonData = urlParams.get('data');
+                
+                if (jsonData) {
+                    try {
+                        // Try to parse the URL parameter as JSON
+                        const parsedData = JSON.parse(decodeURIComponent(jsonData));
+                        return processInputData(parsedData);
+                    } catch (e) {
+                        console.error("Error parsing JSON from URL:", e);
+                    }
+                }
+                
+                // If no valid JSON in URL, check for a data element
+                const dataElement = document.getElementById('loreData');
+                if (dataElement && dataElement.textContent.trim()) {
+                    try {
+                        const parsedData = JSON.parse(dataElement.textContent);
+                        return processInputData(parsedData);
+                    } catch (e) {
+                        console.error("Error parsing JSON from data element:", e);
+                    }
+                }
+                
+                // If no data in URL or element, load from lore-data.json
+                try {
+                    // Use XMLHttpRequest instead of fetch for better compatibility with local files
+                    return new Promise((resolve, reject) => {
+                        const xhr = new XMLHttpRequest();
+                        xhr.overrideMimeType("application/json");
+                        xhr.open('GET', 'lore-data.json', true);
+                        
+                        xhr.onload = function() {
+                            if (xhr.status === 200) {
+                                try {
+                                    const jsonData = JSON.parse(xhr.responseText);
+                                    resolve(processInputData(jsonData));
+                                } catch (e) {
+                                    console.error("Error parsing JSON from file:", e);
+                                    reject(e);
+                                }
+                            } else {
+                                console.error("Error loading JSON file, status: " + xhr.status);
+                                reject(new Error(`HTTP error! status: ${xhr.status}`));
+                            }
+                        };
+                        
+                        xhr.onerror = function() {
+                            console.error("Error loading JSON file. This might be due to CORS restrictions when running locally.");
+                            console.log("Try running with a local server, e.g.: python -m http.server");
+                            reject(new Error("Network error"));
+                        };
+                        
+                        xhr.send();
+                    });
+                } catch (e) {
+                    console.error("Error loading JSON from file:", e);
+                    // Load hardcoded fallback data
+                    return loadFallbackData();
+                }
+            } catch (e) {
+                console.error("Error in loadData:", e);
+                return loadFallbackData(); // Return fallback data on error
+            }
+        }
+        
+        // Fallback data in case the JSON file can't be loaded
+        function loadFallbackData() {
+            console.log("Loading fallback data");
+            return {
+                users: []
+            };
+        }
+        
+        // Initialize data
+        loadData().then(loadedData => {
+            data = loadedData;
+            
+            // Initialize the page with the loaded data
+            const params = getUrlParams();
+            currentState.user = params.user;
+            currentState.theory = params.theory;
+            
+            if (currentState.user && currentState.theory) {
+                renderTheory(currentState.user, currentState.theory);
+            } else if (currentState.user) {
+                renderTheories(currentState.user);
+            } else {
+                renderUsers();
+            }
+            
+            updateBreadcrumb();
+        }).catch(error => {
+            console.error("Failed to load data:", error);
+            renderError("Failed to load data: " + error.message);
+        });
+        
+        // State management
+        let currentState = {
+            user: null,
+            theory: null
+        };
+        
+        // Parse URL parameters
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                user: params.get('user'),
+                theory: params.get('theory')
+            };
+        }
+        
+        // Update URL with current state
+        function updateUrl() {
+            const params = new URLSearchParams();
+            if (currentState.user) params.append('user', currentState.user);
+            if (currentState.theory) params.append('theory', currentState.theory);
+            
+            const newUrl = `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`;
+            window.history.pushState({}, '', newUrl);
+        }
+        
+        // Update breadcrumb based on current state
+        function updateBreadcrumb() {
+            const breadcrumb = document.getElementById('breadcrumb');
+            let html = '<a href="lore.html">𒐪</a>';
+            
+            if (currentState.user) {
+                const user = data.users.find(u => u.id.toString() === currentState.user.toString());
+                if (user) {
+                    html += '<span class="separator">/</span>';
+                    html += `<a href="lore.html?user=${user.id}">${user.name}</a>`;
+                    
+                    if (currentState.theory) {
+                        const theory = user.theories.find(t => t.name === currentState.theory);
+                        if (theory) {
+                            html += '<span class="separator">/</span>';
+                            html += `<span class="current">${theory.name}</span>`;
+                        }
+                    }
+                }
+            }
+            
+            breadcrumb.innerHTML = html;
+        }
+        
+        // Render users mosaic
+        function renderUsers() {
+            const contentDiv = document.getElementById('content');
+            
+            // Create mosaic container
+            const mosaic = document.createElement('div');
+            mosaic.className = 'mosaic';
+            
+            // Add tiles for each user
+            data.users.forEach(user => {
+                const tile = document.createElement('div');
+                tile.className = 'tile';
+                tile.addEventListener('click', () => navigateTo('user', user.id));
+                
+                const img = document.createElement('img');
+                img.src = user.image;
+                img.alt = user.name;
+                
+                const content = document.createElement('div');
+                content.className = 'tile-content';
+                
+                const title = document.createElement('div');
+                title.className = 'tile-title';
+                title.textContent = user.name;
+                
+                const subtitle = document.createElement('div');
+                subtitle.className = 'tile-subtitle';
+                subtitle.textContent = `${user.theories.length} theories`;
+                
+                content.appendChild(title);
+                content.appendChild(subtitle);
+                
+                tile.appendChild(img);
+                tile.appendChild(content);
+                mosaic.appendChild(tile);
+            });
+            
+            // Replace content with new mosaic
+            contentDiv.innerHTML = '';
+            contentDiv.appendChild(mosaic);
+            
+            // Trigger animation
+            setTimeout(() => {
+                contentDiv.classList.add('active');
+            }, 10);
+        }
+        
+        // Render theories for a specific user
+        function renderTheories(userId) {
+            const user = data.users.find(u => u.id.toString() === userId.toString());
+            if (!user) {
+                renderError("User not found");
+                return;
+            }
+            
+            const contentDiv = document.getElementById('content');
+            
+            // Create mosaic container
+            const mosaic = document.createElement('div');
+            mosaic.className = 'mosaic';
+            
+            // Add tiles for each theory
+            user.theories.forEach(theory => {
+                const tile = document.createElement('div');
+                tile.className = 'tile';
+                tile.addEventListener('click', () => navigateTo('theory', theory.name, userId));
+                
+                const img = document.createElement('img');
+                img.src = theory.image;
+                img.alt = theory.name;
+                
+                const content = document.createElement('div');
+                content.className = 'tile-content';
+                
+                const title = document.createElement('div');
+                title.className = 'tile-title';
+                title.textContent = theory.name;
+                
+                content.appendChild(title);
+                
+                tile.appendChild(img);
+                tile.appendChild(content);
+                mosaic.appendChild(tile);
+            });
+            
+            // Replace content with new mosaic
+            contentDiv.innerHTML = '';
+            contentDiv.appendChild(mosaic);
+            
+            // Trigger animation
+            setTimeout(() => {
+                contentDiv.classList.add('active');
+            }, 10);
+        }
+        
+        // Render theory details - now opens link directly in new tab
+        function renderTheory(userId, theoryName) {
+            const user = data.users.find(u => u.id.toString() === userId.toString());
+            if (!user) {
+                renderError("User not found");
+                return;
+            }
+            
+            const theory = user.theories.find(t => t.name === theoryName);
+            if (!theory) {
+                renderError("Theory not found");
+                return;
+            }
+            
+            // Open the link in a new tab directly
+            if (theory.link) {
+                window.open(theory.link, '_blank');
+            }
+            
+            // Stay on the theories page
+            renderTheories(userId);
+        }
+        
+        // Render error message
+        function renderError(message) {
+            const contentDiv = document.getElementById('content');
+            contentDiv.innerHTML = `
+                <div class="error">
+                    <p>${message}</p>
+                    <p style="margin-top: 15px; font-size: 14px;">
+                        Note: If you're seeing this because the JSON file couldn't be loaded, try running with a local server:<br>
+                        <code style="background: rgba(255,255,255,0.1); padding: 5px; display: inline-block; margin-top: 5px;">python -m http.server</code><br>
+                        Then access via: <code style="background: rgba(255,255,255,0.1); padding: 5px; display: inline-block; margin-top: 5px;">http://localhost:8000/lore.html</code>
+                    </p>
+                </div>
+            `;
+        }
+        
+        // Navigation function
+        function navigateTo(type, value, userId = null) {
+            // Remove active class to trigger transition
+            document.getElementById('content').classList.remove('active');
+            
+            // Wait for transition to complete
+            setTimeout(() => {
+                if (type === 'user') {
+                    currentState.user = value;
+                    currentState.theory = null;
+                    renderTheories(value);
+                } else if (type === 'theory') {
+                    currentState.user = userId;
+                    currentState.theory = value;
+                    renderTheory(userId, value);
+                } else {
+                    currentState.user = null;
+                    currentState.theory = null;
+                    renderUsers();
+                }
+                
+                updateUrl();
+                updateBreadcrumb();
+            }, 300);
+        }
+        
+        // Handle browser back/forward navigation
+        window.addEventListener('popstate', () => {
+            const params = getUrlParams();
+            currentState.user = params.user;
+            currentState.theory = params.theory;
+            
+            if (currentState.user && currentState.theory) {
+                renderTheory(currentState.user, currentState.theory);
+            } else if (currentState.user) {
+                renderTheories(currentState.user);
+            } else {
+                renderUsers();
+            }
+            
+            updateBreadcrumb();
+        });
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Page initialization is handled in the loadData().then() callback
+            console.log("Loading data from lore-data.json...");
+        });
+    </script>
+</body>
+</html>
