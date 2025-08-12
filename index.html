@@ -48,6 +48,7 @@
             z-index: 100;
             display: none;
             border: 1px solid #333;
+            transition: background-color 0.2s ease;
         }
         
         /* Responsive styles */
@@ -892,13 +893,28 @@
         
         // Check if mouse is over a colored dot
         function checkDotHover(mouseX, mouseY) {
+            // Get the device pixel ratio to account for high-DPI displays
+            const pixelRatio = window.devicePixelRatio || 1;
+            
+            // Adjust for any scaling between CSS pixels and canvas pixels
+            const canvasRect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / canvasRect.width;
+            const scaleY = canvas.height / canvasRect.height;
+            
+            // Apply scaling to mouse coordinates
+            const adjustedX = mouseX * scaleX;
+            const adjustedY = mouseY * scaleY;
+            
+            // Check each dot with a slightly larger hit area on mobile
+            const hitAreaMultiplier = isMobile ? 2.0 : 1.5;
+            
             for (let i = 0; i < coloredDots.length; i++) {
                 const dot = coloredDots[i];
-                const dx = mouseX - dot.x;
-                const dy = mouseY - dot.y;
+                const dx = adjustedX - dot.x;
+                const dy = adjustedY - dot.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
                 
-                if (distance < dot.size * 1.5) {
+                if (distance < dot.size * hitAreaMultiplier) {
                     return i; // Return index of hovered dot
                 }
             }
@@ -918,7 +934,13 @@
             document.getElementById('tweetName').textContent = tweet.author;
             document.getElementById('tweetUsername').textContent = tweet.username;
             document.getElementById('tweetContent').textContent = tweet.content;
-            document.getElementById('tweetTimestamp').textContent = tweet.timestamp;
+            
+            // For mobile, add tap instructions
+            if (isMobile) {
+                document.getElementById('tweetTimestamp').textContent = tweet.timestamp + " • Tap to open";
+            } else {
+                document.getElementById('tweetTimestamp').textContent = tweet.timestamp;
+            }
             
             // Position popup near the dot but ensure it stays within viewport
             const popupWidth = Math.min(400, window.innerWidth - 40); // Responsive width
@@ -961,8 +983,9 @@
         // Mouse move event handler
         canvas.addEventListener('mousemove', (e) => {
             const rect = canvas.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
+            // Calculate position within canvas, accounting for CSS scaling
+            const mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
+            const mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
             
             const hoveredDotIndex = checkDotHover(mouseX, mouseY);
             
@@ -983,8 +1006,9 @@
         // Click event handler for opening tweet
         canvas.addEventListener('click', (e) => {
             const rect = canvas.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
+            // Calculate position within canvas, accounting for CSS scaling
+            const mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
+            const mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
             
             const hoveredDotIndex = checkDotHover(mouseX, mouseY);
             
@@ -1000,6 +1024,9 @@
         let lastTouchX = 0;
         let lastTouchY = 0;
         
+        // Track touch start time for tap detection
+        let touchStartTime = 0;
+        
         // Touch start handler
         canvas.addEventListener('touchstart', (e) => {
             e.preventDefault(); // Prevent scrolling when touching the canvas
@@ -1009,9 +1036,11 @@
                 const rect = canvas.getBoundingClientRect();
                 lastTouchX = touch.clientX;
                 lastTouchY = touch.clientY;
+                touchStartTime = Date.now(); // Record touch start time
                 
-                const touchX = touch.clientX - rect.left;
-                const touchY = touch.clientY - rect.top;
+                // Calculate position within canvas, accounting for CSS scaling
+                const touchX = (touch.clientX - rect.left) * (canvas.width / rect.width);
+                const touchY = (touch.clientY - rect.top) * (canvas.height / rect.height);
                 
                 const touchedDotIndex = checkDotHover(touchX, touchY);
                 
@@ -1019,12 +1048,19 @@
                     // Show popup on touch
                     showTweetPopup(touchedDotIndex, touch.clientX, touch.clientY);
                     
+                    // Store the touched dot index for use in touchend
+                    window.lastTouchedDotIndex = touchedDotIndex;
+                    
                     // Set a timer to detect long press
                     touchTimer = setTimeout(() => {
                         // Long press - open the URL
                         const tweet = tweetsData[touchedDotIndex];
                         window.open(tweet.url, '_blank');
                         touchTimer = null;
+                        
+                        // Show feedback that link is opening
+                        const popup = document.getElementById('tweetPopup');
+                        popup.style.backgroundColor = 'rgba(40, 40, 40, 0.9)';
                     }, 800); // 800ms for long press
                 }
             }
@@ -1034,15 +1070,34 @@
         canvas.addEventListener('touchend', (e) => {
             e.preventDefault();
             
+            // Calculate touch duration
+            const touchDuration = Date.now() - touchStartTime;
+            
             // Clear the long press timer
             if (touchTimer) {
                 clearTimeout(touchTimer);
                 touchTimer = null;
+                
+                // If this was a short tap (< 300ms) and we have a valid dot index, open the URL
+                if (touchDuration < 300 && window.lastTouchedDotIndex !== undefined) {
+                    const tweet = tweetsData[window.lastTouchedDotIndex];
+                    window.open(tweet.url, '_blank');
+                    
+                    // Show feedback that link is opening
+                    const popup = document.getElementById('tweetPopup');
+                    popup.style.backgroundColor = 'rgba(40, 40, 40, 0.9)';
+                }
             }
+            
+            // Reset the touched dot index
+            window.lastTouchedDotIndex = undefined;
             
             // Hide popup after a short delay to allow for reading
             setTimeout(() => {
                 hideTweetPopup();
+                // Reset popup background color
+                const popup = document.getElementById('tweetPopup');
+                popup.style.backgroundColor = 'rgba(20, 20, 20, 0.9)';
             }, 1000);
         });
         
