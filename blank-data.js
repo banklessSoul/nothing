@@ -1,0 +1,111 @@
+const tweetsData = [
+    {
+        "id": "1324533296357888000",
+        "url": "https://x.com/SHL0MS/status/1324533296357888000",
+        "content": " ︎ ︎",
+        "author": "𒐪",
+        "username": "@SHL0MS",
+        "timestamp": "Nov 5, 2020",
+        "type": "origin",
+        "profilePic": "https://pbs.twimg.com/profile_images/1920126904994082816/EBFBcYtO_400x400.png"
+    },
+    {
+        "id": "1854947335651872886",
+        "url": "https://x.com/god/status/1854947335651872886",
+        "content": "︎ ︎ ︎",
+        "author": "God",
+        "username": "@god",
+        "timestamp": "Nov 8, 2024",
+        "profilePic": "https://pbs.twimg.com/profile_images/1880403110893400065/iMwI-2m-_400x400.jpg"
+    },
+    {
+        "id": "1864346641110601786",
+        "url": "https://x.com/s8n/status/1864346641110601786",
+        "content": "︎ ︎ ︎",
+        "author": "Satan",
+        "username": "@s8n",
+        "timestamp": "Dec 4, 2024",
+        "profilePic": "https://pbs.twimg.com/profile_images/1880278672222916608/xIG6V6Rn_400x400.jpg"
+    },
+    {
+        "id": "1943473467090985343",
+        "url": "https://x.com/RaydiumProtocol/status/1943473467090985343",
+        "content": "︎ ︎ ︎",
+        "author": "Raydium",
+        "username": "@RaydiumProtocol",
+        "timestamp": "Jul 10, 2025",
+        "profilePic": "https://pbs.twimg.com/profile_images/1742621757230678016/_Av2hYEY_400x400.jpg"
+    },
+    {
+        "id": "1946985883535634688",
+        "url": "https://x.com/thegreatola/status/1946985883535634688",
+        "content": "︎ ︎ ︎",
+        "author": "Ola Ξlixir",
+        "username": "@thegreatola",
+        "timestamp": "Jul 20, 2025",
+        "profilePic": "https://pbs.twimg.com/profile_images/1945817318388305920/hrVc8K5f_400x400.jpg"
+    },
+    {
+        "id": "1947213250682101783",
+        "url": "https://x.com/user0000O0/status/1947213250682101783",
+        "content": "︎ ︎ ︎",
+        "author": "&rlm;",
+        "username": "@user0000O0",
+        "timestamp": "Jul 21, 2025",
+        "profilePic": "https://pbs.twimg.com/profile_images/1842335199184515072/Ll2z_0VH_400x400.jpg"
+    },
+    {
+        "id": "1500876602569232384",
+        "url": "https://x.com/slvppy/status/1500876602569232384",
+        "content": "︎ ︎ ︎",
+        "author": "Slap",
+        "username": "@slvppy",
+        "timestamp": "July 23, 2024",
+        "profilePic": "https://pbs.twimg.com/profile_images/1478227815333969920/4lTpR0An_400x400.jpg"
+    },
+    {
+        "id": "1953264656803365256",
+        "url": "https://x.com/PleasrDAO/status/1953264656803365256",
+        "content": "︎ ︎ ︎",
+        "author": "Pleasr",
+        "username": "@PleasrDAO",
+        "timestamp": "Aug 6, 2025",
+        "profilePic": "https://pbs.twimg.com/profile_images/1893093825473613824/yYqAO0Nl_400x400.jpg"
+    },
+    {
+        "id": "1907162255336366243",
+        "url": "https://x.com/cb_doge/status/1907162255336366243",
+        "content": "︎ ︎ ︎",
+        "author": "DogeDesigner",
+        "username": "@cb_doge",
+        "timestamp": "Apr 1, 2025",
+        "profilePic": "https://pbs.twimg.com/profile_images/1498070100393754625/C2V-fbll_400x400.jpg"
+    },
+    {
+        "id": "1946256901878259764",
+        "url": "https://x.com/VorosTwins/status/1946256901878259764",
+        "content": "︎ ︎ ︎",
+        "author": "DA VINKI",
+        "username": "@VorosTwins",
+        "timestamp": "Jul 18, 2025",
+        "profilePic": "https://pbs.twimg.com/profile_images/1484161306512920576/PE8QqPge_400x400.jpg"
+    },
+    {
+        "id": "1940773250520527129",
+        "url": "https://x.com/LostMemeArchive/status/1940773250520527129",
+        "content": "︎ ︎ ︎",
+        "author": "Lost Meme Archive",
+        "username": "@LostMemeArchive",
+        "timestamp": "Jul 3, 2025",
+        "profilePic": "https://pbs.twimg.com/profile_images/1914120748567785472/ffFpNobt_400x400.png"
+    },
+    {
+        "id": "1953923375010918403",
+        "url": "https://x.com/Cyb4rAnG3L/status/1953923375010918403",
+        "content": "︎ ︎ ︎",
+        "author": "🐈‍⬛",
+        "username": "@Cyb4rAnG3L",
+        "timestamp": "Aug 8, 2025",
+        "profilePic": "https://pbs.twimg.com/profile_images/1938321133884813312/BU8hdbr__400x400.jpg"
+    }
+];
