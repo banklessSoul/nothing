@@ -8,11 +8,33 @@
         "name": "Nothing",
         "image": "https://pbs.twimg.com/media/Guzz9rCXMAACnck?format=png&name=4096x4096",
         "link": "/nothing.html"
+      },
+      {
+        "name": "whitepaper",
+        "image": "https://pbs.twimg.com/profile_banners/901778891429306368/1729697077/1500x500",
+        "link": "https://zora.co/collect/base:0xd7dae87738cd553d696e201bad3d58ce1267cb3f/1"
+      },
+      {
+        "name": "no crying in the cathedral.",
+        "image": "https://pbs.twimg.com/media/GsNASelXUAAJyO9?format=jpg&name=4096x4096",
+        "link": "https://zora.co/coin/base:0xa1af388e896c2535d6a8aa52e11326e1bb396fa0"
       }
     ]
   },
   {
     "user": 2,
+    "name": "Know Your Meme",
+    "image": "https://pbs.twimg.com/profile_images/1510957646865653762/sLCBY1Qa_400x400.jpg",
+    "theory": [
+      {
+        "name": "Nothing Coin (Meme Coin)",
+        "image": "https://i.kym-cdn.com/entries/icons/original/000/052/557/Nothing_Meme_Coin_cover.jpg",
+        "link": "https://knowyourmeme.com/memes/subcultures/nothing-coin-meme-coin"
+      }
+    ]
+  },
+  {
+    "user": 3,
     "name": "⨳ Telos ⨳ ɎS ✦",
     "image": "https://pbs.twimg.com/profile_images/1945377435064664064/tCyRvNMi_400x400.jpg",
     "theory": [
@@ -39,7 +61,7 @@
     ]
   },
   {
-    "user": 3,
+    "user": 4,
     "name": "0xpodi",
     "image": "https://pbs.twimg.com/profile_images/1901183552945115136/HpVSPIg3_400x400.jpg",
     "theory": [
@@ -71,7 +93,7 @@
     ]
   },
   {
-    "user": 4,
+    "user": 5,
     "name": "Nous Research",
     "image": "https://pbs.twimg.com/profile_images/1816254738234761216/TX7TW-Mp_400x400.jpg",
     "theory": [
@@ -83,7 +105,7 @@
     ]
   },
   {
-    "user": 5,
+    "user": 6,
     "name": "UnknownCollector",
     "image": "https://pbs.twimg.com/profile_images/1882736871299551232/YE8hiBUm_400x400.jpg",
     "theory": [
@@ -95,7 +117,7 @@
     ]
   },
   {
-    "user": 6,
+    "user": 7,
     "name": "Krzysztof Cichy",
     "image": "https://pbs.twimg.com/profile_images/1885689995492560896/N4NoqZP9_400x400.jpg",
     "theory": [
@@ -107,7 +129,7 @@
     ]
   },
   {
-    "user": 7,
+    "user": 8,
     "name": "peace",
     "image": "https://pbs.twimg.com/profile_banners/901778891429306368/1729697077/1500x500",
     "theory": [
