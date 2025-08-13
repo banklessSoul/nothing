@@ -255,9 +255,9 @@
         }
     </style>
 </head>
-<body>
+<body id="top">
     <div class="breadcrumb" id="breadcrumb">
-        <a href="lore.html">𒐪</a>
+        <a href="lore.html#top">𒐪</a>
     </div>
     
     <div class="container">
@@ -701,6 +701,9 @@
         document.addEventListener('DOMContentLoaded', () => {
             // Page initialization is handled in the loadData().then() callback
             console.log("Loading data from lore-data.json...");
+            
+            // Scroll to top when page loads
+            window.scrollTo(0, 0);
         });
     </script>
 </body>
