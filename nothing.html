@@ -274,10 +274,13 @@
             </div>
         </div>
         <div class="content" id="tweetContent"></div>
-        <div class="timestamp" id="tweetTimestamp"></div>
-    </div>
+    <div class="timestamp" id="tweetTimestamp"></div>
+</div>
 
-    <script>
+<!-- Load tweet data from external JS file -->
+<script src="blank-data.js"></script>
+
+<script>
         const canvas = document.getElementById('blackHoleCanvas');
         const ctx = canvas.getContext('2d');
         
@@ -320,118 +323,8 @@
         // White color for all dots
         const dotColor = '#ffffff';
         
-        // Tweet data array - can easily add more tweets
-        const tweetsData = [
-            {
-                id: '1324533296357888000',
-                url: 'https://x.com/SHL0MS/status/1324533296357888000',
-                content: " ︎ ︎",
-                author: '𒐪',
-                username: '@SHL0MS',
-                timestamp: 'Nov 5, 2020',
-                type: 'origin',
-                profilePic: 'https://pbs.twimg.com/profile_images/1920126904994082816/EBFBcYtO_400x400.png'
-            },
-            {
-                id: '1854947335651872886',
-                url: 'https://x.com/god/status/1854947335651872886',
-                content: "︎ ︎ ︎",
-                author: 'God',
-                username: '@god',
-                timestamp: 'Nov 8, 2024',
-                profilePic: 'https://pbs.twimg.com/profile_images/1880403110893400065/iMwI-2m-_400x400.jpg'
-            },
-            {
-                id: '1864346641110601786',
-                url: 'https://x.com/s8n/status/1864346641110601786',
-                content: "︎ ︎ ︎",
-                author: 'Satan',
-                username: '@s8n',
-                timestamp: 'Dec 4, 2024',
-                profilePic: 'https://pbs.twimg.com/profile_images/1880278672222916608/xIG6V6Rn_400x400.jpg'
-            },
-            {
-                id: '1943473467090985343',
-                url: 'https://x.com/RaydiumProtocol/status/1943473467090985343',
-                content: "︎ ︎ ︎",
-                author: 'Raydium',
-                username: '@RaydiumProtocol',
-                timestamp: 'Jul 10, 2025',
-                profilePic: 'https://pbs.twimg.com/profile_images/1742621757230678016/_Av2hYEY_400x400.jpg'
-            },
-            {
-                id: '1946985883535634688',
-                url: 'https://x.com/thegreatola/status/1946985883535634688',
-                content: "︎ ︎ ︎",
-                author: 'Ola Ξlixir',
-                username: '@thegreatola',
-                timestamp: 'Jul 20, 2025',
-                profilePic: 'https://pbs.twimg.com/profile_images/1945817318388305920/hrVc8K5f_400x400.jpg'
-            },
-            {
-                id: '1947213250682101783',
-                url: 'https://x.com/user0000O0/status/1947213250682101783',
-                content: "︎ ︎ ︎",
-                author: '&rlm;',
-                username: '@user0000O0',
-                timestamp: 'Jul 21, 2025',
-                profilePic: 'https://pbs.twimg.com/profile_images/1842335199184515072/Ll2z_0VH_400x400.jpg'
-            },
-            {
-                id: '1500876602569232384',
-                url: 'https://x.com/slvppy/status/1500876602569232384',
-                content: "︎ ︎ ︎",
-                author: 'Slap',
-                username: '@slvppy',
-                timestamp: 'July 23, 2024',
-                profilePic: 'https://pbs.twimg.com/profile_images/1478227815333969920/4lTpR0An_400x400.jpg'
-            },
-            {
-                id: '1953264656803365256',
-                url: 'https://x.com/PleasrDAO/status/1953264656803365256',
-                content: "︎ ︎ ︎",
-                author: 'Pleasr',
-                username: '@PleasrDAO',
-                timestamp: 'Aug 6, 2025',
-                profilePic: 'https://pbs.twimg.com/profile_images/1893093825473613824/yYqAO0Nl_400x400.jpg'
-            },
-            {
-                id: '1907162255336366243',
-                url: 'https://x.com/cb_doge/status/1907162255336366243',
-                content: "︎ ︎ ︎",
-                author: 'DogeDesigner',
-                username: '@cb_doge',
-                timestamp: 'Apr 1, 2025',
-                profilePic: 'https://pbs.twimg.com/profile_images/1498070100393754625/C2V-fbll_400x400.jpg'
-            },
-            {
-                id: '1946256901878259764',
-                url: 'https://x.com/VorosTwins/status/1946256901878259764',
-                content: "︎ ︎ ︎",
-                author: 'DA VINKI',
-                username: '@VorosTwins',
-                timestamp: 'Jul 18, 2025',
-                profilePic: 'https://pbs.twimg.com/profile_images/1484161306512920576/PE8QqPge_400x400.jpg'
-            },
-            {
-                id: '1940773250520527129',
-                url: 'https://x.com/LostMemeArchive/status/1940773250520527129',
-                content: "︎ ︎ ︎",
-                author: 'Lost Meme Archive',
-                username: '@LostMemeArchive',
-                timestamp: 'Jul 3, 2025',
-                profilePic: 'https://pbs.twimg.com/profile_images/1914120748567785472/ffFpNobt_400x400.png'
-            },
-            {
-                id: '1953923375010918403',
-                url: 'https://x.com/Cyb4rAnG3L/status/1953923375010918403',
-                content: "︎ ︎ ︎",
-                author: '🐈‍⬛',
-                username: '@Cyb4rAnG3L',
-                timestamp: 'Aug 8, 2025',
-                profilePic: 'https://pbs.twimg.com/profile_images/1938321133884813312/BU8hdbr__400x400.jpg'
-            }
-        ];
+        // Tweet data array is loaded from blank-data.js via script tag
+        // The variable tweetsData is defined in blank-data.js
         
         // Animation speed control - slowed down by 2x
         const speedFactor = 0.15; // Original was 0.3, now half speed
@@ -717,7 +610,7 @@
             
             // Determine base size based on screen size
             const isMobile = window.innerWidth < 768;
-            const baseSizeDesktop = 18;
+            const baseSizeDesktop = 20;
             const baseSizeMobile = 14; // Smaller on mobile
             const baseSize = isMobile ? baseSizeMobile : baseSizeDesktop;
             
@@ -726,14 +619,23 @@
                 const tweet = tweetsData[i];
                 let x, y, size;
                 
-                // Use consistent sizes without randomness
-                const dotSize = baseSize; // Fixed size for consistency
+                // Determine size based on whether the tweet should be animated
+                // Non-animated tweets will be displayed as smaller circles
+                let dotSize;
+                if (tweet.animate === false) {
+                    // Smaller size for non-animated tweets
+                    dotSize = baseSize * 0.5; // 50% of the normal size (smaller)
+                    console.log("Found non-animated tweet:", tweet.id, tweet.author, "- using smaller size:", dotSize);
+                } else {
+                    // Normal size for animated tweets
+                    dotSize = baseSize;
+                }
                 
                 if (tweet.type === 'origin') {
                     // Position origin tweet at the center of the wormhole
                     x = originX;
                     y = originY;
-                    size = baseSize * 1.7; // Origin is 1.7x larger than base size (not dotSize)
+                    size = baseSize * 1.7; // Origin is 1.7x larger than base size
                 } else {
                     // For non-origin tweets, use a grid-based approach to better utilize screen space
                     let isValidPosition = false;
@@ -849,7 +751,7 @@
                     }
                     
                     // Use consistent size for all non-origin dots
-                    size = baseSize;
+                    size = dotSize;
                 }
                 
                 // Add dot with profile image
@@ -909,7 +811,9 @@
                 // Restore context
                 ctx.restore();
                 
-                // Add a thin white border for definition
+                // Add a border - different color for non-animated dots
+                const dotIndex = dot.imageIndex;
+                const tweet = tweetsData[dotIndex];
                 ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
                 ctx.lineWidth = 1;
                 ctx.beginPath();
@@ -1037,12 +941,13 @@
         }
         
         // Show tweet popup
-        function showTweetPopup(dotIndex, mouseX, mouseY) {
+        function showTweetPopup(dotIndex, clientX, clientY) {
             const popup = document.getElementById('tweetPopup');
             
             // Get tweet data for this dot
             // Each dot corresponds to exactly one tweet
             const tweet = tweetsData[dotIndex];
+            const dot = coloredDots[dotIndex];
             
             // Populate tweet content from data
             document.getElementById('tweetProfilePic').src = tweet.profilePic;
@@ -1064,23 +969,37 @@
             // Get footer height to avoid overlapping
             const footerHeight = 80; // Same as footer-area height
             
-            let left = mouseX + 20;
-            let top = mouseY - popupHeight / 2;
+            // Convert canvas coordinates to screen coordinates
+            const canvasRect = canvas.getBoundingClientRect();
+            const scaleX = canvasRect.width / canvas.width;
+            const scaleY = canvasRect.height / canvas.height;
             
-            // Adjust if too close to right edge
-            if (left + popupWidth > window.innerWidth) {
-                left = Math.max(10, mouseX - popupWidth - 20);
+            // Calculate screen position of the dot
+            const screenX = dot.x * scaleX + canvasRect.left;
+            const screenY = dot.y * scaleY + canvasRect.top;
+            
+            // Position differently based on screen quadrant to avoid edges
+            let left, top;
+            
+            if (dot.x < canvas.width / 2) {
+                // Left half of screen - position to the right of dot
+                left = screenX + dot.size * scaleX * 2;
+            } else {
+                // Right half of screen - position to the left of dot
+                left = screenX - popupWidth - dot.size * scaleX * 2;
             }
             
-            // Adjust if too close to top/bottom edge
-            if (top < 20) {
-                // If near top, position below the dot instead of centered
-                top = mouseY + 20;
+            if (dot.y < canvas.height / 2) {
+                // Top half - position below dot
+                top = screenY + dot.size * scaleY * 2;
+            } else {
+                // Bottom half - position above dot
+                top = screenY - popupHeight - dot.size * scaleY * 2;
             }
-            if (top + popupHeight > window.innerHeight - footerHeight) {
-                // If near bottom, position above the dot
-                top = mouseY - popupHeight - 20;
-            }
+            
+            // Ensure popup stays within viewport
+            left = Math.max(20, Math.min(window.innerWidth - popupWidth - 20, left));
+            top = Math.max(20, Math.min(window.innerHeight - footerHeight - 20, top));
             
             // For mobile, center horizontally if screen is narrow
             if (window.innerWidth < 500) {
@@ -1270,29 +1189,31 @@
         // Viral movement animation
         let isAnimationRunning = false;
         
-        // Sort tweets by timestamp for chronological animation
-        const sortedTweets = [...tweetsData].sort((a, b) => {
-            // Always put origin tweet first
-            if (a.type === 'origin') return -1;
-            if (b.type === 'origin') return 1;
-            
-            // Parse dates for comparison
-            // Convert month names to numbers
-            const monthMap = {
-                'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
-                'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
-            };
-            
-            const parseDate = (dateStr) => {
-                const parts = dateStr.split(' ');
-                const month = monthMap[parts[0]];
-                const day = parseInt(parts[1].replace(',', ''));
-                const year = parseInt(parts[2]);
-                return new Date(year, month, day);
-            };
-            
-            return parseDate(a.timestamp) - parseDate(b.timestamp);
-        });
+        // Filter tweets that should be animated and sort them by timestamp
+        const sortedTweets = [...tweetsData]
+            .filter(tweet => tweet.animate === true) // Only include tweets with animate: true
+            .sort((a, b) => {
+                // Always put origin tweet first
+                if (a.type === 'origin') return -1;
+                if (b.type === 'origin') return 1;
+                
+                // Parse dates for comparison
+                // Convert month names to numbers
+                const monthMap = {
+                    'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
+                    'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
+                };
+                
+                const parseDate = (dateStr) => {
+                    const parts = dateStr.split(' ');
+                    const month = monthMap[parts[0]];
+                    const day = parseInt(parts[1].replace(',', ''));
+                    const year = parseInt(parts[2]);
+                    return new Date(year, month, day);
+                };
+                
+                return parseDate(a.timestamp) - parseDate(b.timestamp);
+            });
         
         function startViralAnimation() {
             if (isAnimationRunning) return;
@@ -1355,23 +1276,32 @@
                 const popupWidth = 400;
                 const popupHeight = 150;
                 
+                // Convert canvas coordinates to screen coordinates
+                const canvasRect = canvas.getBoundingClientRect();
+                const scaleX = canvasRect.width / canvas.width;
+                const scaleY = canvasRect.height / canvas.height;
+                
+                // Calculate screen position of the dot
+                const screenX = dot.x * scaleX + canvasRect.left;
+                const screenY = dot.y * scaleY + canvasRect.top;
+                
                 // Position differently based on screen quadrant to avoid edges
                 let left, top;
                 
                 if (dot.x < canvas.width / 2) {
                     // Left half of screen - position to the right of dot
-                    left = dot.x + dot.size * 2;
+                    left = screenX + dot.size * scaleX * 2;
                 } else {
                     // Right half of screen - position to the left of dot
-                    left = dot.x - popupWidth - dot.size * 2;
+                    left = screenX - popupWidth - dot.size * scaleX * 2;
                 }
                 
                 if (dot.y < canvas.height / 2) {
                     // Top half - position below dot
-                    top = dot.y + dot.size * 2;
+                    top = screenY + dot.size * scaleY * 2;
                 } else {
                     // Bottom half - position above dot
-                    top = dot.y - popupHeight - dot.size * 2;
+                    top = screenY - popupHeight - dot.size * scaleY * 2;
                 }
                 
                 // Ensure popup stays within viewport
@@ -1444,12 +1374,20 @@
             }
         }
         
-        // Initialize
-        initParticles();
-        loadProfileImages();
-        
-        // Create dots immediately
-        createColoredDots();
+        // Initialize when the page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            // Initialize particles
+            initParticles();
+            
+            // Load profile images
+            loadProfileImages();
+            
+            // Create dots
+            createColoredDots();
+            
+            // Start animation with timestamp
+            requestAnimationFrame(animate);
+        });
         
         // Start animation automatically when page loads
         window.addEventListener('load', () => {
@@ -1491,8 +1429,7 @@
             }, 200);
         });
         
-        // Start animation with timestamp
-        requestAnimationFrame(animate);
+        // Animation will start after data is loaded in initializeAfterDataLoad()
     </script>
 </body>
 </html>
