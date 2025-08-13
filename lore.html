@@ -758,6 +758,9 @@
                 
                 updateUrl();
                 updateBreadcrumb();
+                
+                // Scroll back to top on navigation
+                window.scrollTo(0, 0);
             }, 300);
         }
         
@@ -776,6 +779,9 @@
             }
             
             updateBreadcrumb();
+            
+            // Scroll back to top on browser navigation
+            window.scrollTo(0, 0);
         });
         
         // Initialize the page
