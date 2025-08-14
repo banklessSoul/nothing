@@ -130,5 +130,25 @@ const tweetsData = [
         "timestamp": "Jun 21, 2025",
         "profilePic": "https://pbs.twimg.com/profile_images/1918595988778094592/1irHeiVg_400x400.jpg",
         "animate": false
+    },
+    {
+        "id": "1946648032889405492",
+        "url": "https://x.com/serloost/status/1946648032889405492",
+        "content": "︎ ︎ ︎",
+        "author": "loosty",
+        "username": "@serloost",
+        "timestamp": "Jul 19, 2025",
+        "profilePic": "https://pbs.twimg.com/profile_images/1900390157330583552/7TnP9HSb_400x400.jpg",
+        "animate": false
+    },
+    {
+        "id": "1951869736741994591",
+        "url": "https://x.com/isjuustadream/status/1951869736741994591",
+        "content": "︎ ︎ ︎",
+        "author": "Everything",
+        "username": "@isjuustadream",
+        "timestamp": "Aug 2, 2025",
+        "profilePic": "https://pbs.twimg.com/profile_images/1845179276779536384/0p6ToUxn_400x400.jpg",
+        "animate": false
     }
 ];
