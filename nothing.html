@@ -85,6 +85,26 @@
             transform: scale(0.9);
         }
         
+        /* Network effect popup styles - smaller and less opacity */
+        .network-popup {
+            position: absolute;
+            background-color: rgba(20, 20, 20, 0.5); /* Less opacity as requested */
+            border-radius: 8px;
+            padding: 10px;
+            max-width: 220px; /* Smaller width */
+            width: calc(100% - 30px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+            color: rgba(238, 238, 238, 0.8); /* Less visible text */
+            font-size: 12px; /* Smaller font */
+            line-height: 1.3;
+            z-index: 90; /* Lower z-index than main popups */
+            display: block; /* Start visible */
+            border: 1px solid rgba(51, 51, 51, 0.3); /* Less visible border */
+            transition: all 0.4s ease;
+            opacity: 0;
+            transform: scale(0.8);
+        }
+        
         .tweet-popup.visible {
             opacity: 1;
             transform: scale(1);
@@ -93,6 +113,17 @@
         .tweet-popup.fading {
             opacity: 0;
             transform: scale(0.8);
+        }
+        
+        .network-popup.visible {
+            opacity: 0.8; /* Less visible as requested */
+            /* Note: We're not setting transform:scale(1) here because we're using custom scaling for each popup */
+        }
+        
+        .network-popup.fading {
+            opacity: 0;
+            /* Scale down from whatever the current scale is */
+            transform: scale(0.7) !important;
         }
         
         /* Responsive styles */
@@ -112,7 +143,8 @@
             }
         }
         
-        .tweet-popup .tweet-header {
+        .tweet-popup .tweet-header,
+        .network-popup .tweet-header {
             display: flex;
             align-items: center;
             margin-bottom: 10px;
@@ -125,7 +157,15 @@
             margin-right: 10px;
         }
         
-        .tweet-popup .user-info {
+        .network-popup .profile-pic {
+            width: 28px; /* Smaller profile pic */
+            height: 28px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .tweet-popup .user-info,
+        .network-popup .user-info {
             flex-grow: 1;
         }
         
@@ -134,17 +174,38 @@
             margin-bottom: 2px;
         }
         
+        .network-popup .name {
+            font-weight: bold;
+            margin-bottom: 1px;
+            font-size: 11px;
+        }
+        
         .tweet-popup .username {
             color: #999;
+        }
+        
+        .network-popup .username {
+            color: #999;
+            font-size: 10px;
         }
         
         .tweet-popup .content {
             margin-bottom: 10px;
         }
         
+        .network-popup .content {
+            margin-bottom: 8px;
+            font-size: 11px;
+        }
+        
         .tweet-popup .timestamp {
             color: #999;
             font-size: 12px;
+        }
+        
+        .network-popup .timestamp {
+            color: #999;
+            font-size: 10px;
         }
         
         .tweet-popup .twitter-logo {
@@ -274,8 +335,11 @@
             </div>
         </div>
         <div class="content" id="tweetContent"></div>
-    <div class="timestamp" id="tweetTimestamp"></div>
-</div>
+        <div class="timestamp" id="tweetTimestamp"></div>
+    </div>
+    
+    <!-- Container for network effect popups -->
+    <div id="networkPopupsContainer"></div>
 
 <!-- Load tweet data from external JS file -->
 <script src="blank-data.js"></script>
@@ -1215,6 +1279,312 @@
                 return parseDate(a.timestamp) - parseDate(b.timestamp);
             });
         
+        // Network effect popups - smaller popups that appear randomly
+        const networkPopups = [];
+        // Reduce maximum popups to improve performance
+        const maxNetworkPopups = isMobile ? 40 : 80; // Reduced to improve performance
+        
+        // Generate random content for network popups
+        function generateRandomNetworkContent() {
+            // Random emoji/symbols for content
+            const symbols = ["︎ ︎ ︎", "︎ ︎", "︎ ︎ ︎ ︎", "︎ ︎ ︎"];
+            
+            // Use "Anonymous" for all usernames as requested
+            const usernames = ["@Anonymous", "@Anon"];
+            
+            // Use "Anonymous" for all names as requested
+            const names = ["Anon"];
+            
+            // Random timestamps (recent dates)
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const month = months[Math.floor(Math.random() * months.length)];
+            const day = Math.floor(Math.random() * 28) + 1;
+            const year = 2025;
+            
+            return {
+                content: symbols[Math.floor(Math.random() * symbols.length)],
+                author: names[Math.floor(Math.random() * names.length)],
+                username: usernames[Math.floor(Math.random() * usernames.length)],
+                timestamp: `${month} ${day}, ${year}`,
+                // Use the specific profile pic as requested
+                profilePic: "https://pbs.twimg.com/profile_images/1842335199184515072/Ll2z_0VH_400x400.jpg"
+            };
+        }
+        
+        // Create a network popup - optimized version
+        function createNetworkPopup() {
+            // Generate random content
+            const content = generateRandomNetworkContent();
+            
+            // Create popup element
+            const popup = document.createElement('div');
+            popup.className = 'network-popup';
+            popup.style.display = 'block'; // Ensure it's visible
+            
+            // Random size between 60% and 100% of original size
+            const sizeScale = 0.60 + Math.random() * 0.25;
+            
+            // Use CSS transform for better performance
+            popup.style.transform = `scale(${sizeScale})`;
+            popup.style.transformOrigin = 'top left';
+            
+            // Use simpler HTML structure on low performance devices
+            if (isLowPerformanceDevice) {
+                popup.innerHTML = `
+                    <div class="tweet-header">
+                        <img class="profile-pic" src="${content.profilePic}" alt="Profile">
+                        <div class="user-info">
+                            <div class="name">${content.author}</div>
+                        </div>
+                    </div>
+                    <div class="timestamp">${content.timestamp}</div>
+                `;
+            } else {
+                popup.innerHTML = `
+                    <div class="tweet-header">
+                        <img class="profile-pic" src="${content.profilePic}" alt="Profile Picture">
+                        <div class="user-info">
+                            <div class="name">${content.author}</div>
+                            <div class="username">${content.username}</div>
+                        </div>
+                    </div>
+                    <div class="content">${content.content}</div>
+                    <div class="timestamp">${content.timestamp}</div>
+                `;
+            }
+            
+            console.log("Creating network popup");
+            
+            // Position evenly across the screen using a grid-based approach
+            const margin = 20;
+            
+            // Divide the screen into a grid for more even distribution
+            const gridCols = 4; // Number of columns in the grid
+            const gridRows = 5; // Number of rows in the grid
+            
+            // Calculate available space
+            const availableWidth = window.innerWidth - 2 * margin;
+            const availableHeight = window.innerHeight - 2 * margin;
+            
+            // Calculate cell size
+            const cellWidth = availableWidth / gridCols;
+            const cellHeight = availableHeight / gridRows;
+            
+            // Choose a random cell in the grid
+            const cellCol = Math.floor(Math.random() * gridCols);
+            const cellRow = Math.floor(Math.random() * gridRows);
+            
+            // Calculate base position for this cell
+            const baseX = margin + cellCol * cellWidth;
+            const baseY = margin + cellRow * cellHeight;
+            
+            // Add some randomness within the cell
+            const cellPadding = Math.min(cellWidth, cellHeight) * 0.2;
+            const left = baseX + cellPadding + Math.random() * (cellWidth - 2 * cellPadding);
+            const top = baseY + cellPadding + Math.random() * (cellHeight - 2 * cellPadding);
+            
+            // Avoid center area - increased avoidance radius as requested
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            const centerAvoidance = Math.min(window.innerWidth, window.innerHeight) * 0.4; // Increased from 0.25 to 0.4
+            const dx = left - centerX;
+            const dy = top - centerY;
+            const distToCenter = Math.sqrt(dx * dx + dy * dy);
+            
+            // If too close to center, adjust position - always move away from origin
+            if (distToCenter < centerAvoidance) {
+                // Move outward from center
+                const angle = Math.atan2(dy, dx);
+                const newDist = centerAvoidance + Math.random() * 100; // Add more randomness and push further out
+                const newX = centerX + Math.cos(angle) * newDist;
+                const newY = centerY + Math.sin(angle) * newDist;
+                
+                // Ensure within bounds
+                const finalLeft = Math.max(margin, Math.min(window.innerWidth - margin, newX));
+                const finalTop = Math.max(margin, Math.min(window.innerHeight - margin, newY));
+                
+                // Set position
+                popup.style.left = finalLeft + 'px';
+                popup.style.top = finalTop + 'px';
+            } else {
+                // Use calculated position
+                popup.style.left = left + 'px';
+                popup.style.top = top + 'px';
+            }
+            
+            // Add to document
+            document.getElementById('networkPopupsContainer').appendChild(popup);
+            
+            // Add to tracking array with duration that increases with animation progress
+            // Early popups have shorter duration, later popups have longer duration
+            // This ensures early popups die out quickly and later ones persist longer
+            const minDuration = 3000; // Base duration
+            const maxAdditionalDuration = 2000; // Reduced maximum additional random duration
+            
+            // Calculate duration based on animation progress
+            // Early in animation: shorter durations
+            // Late in animation: longer durations
+            const progressFactor = Math.pow(animationProgress, 2); // Non-linear curve
+            const baseDuration = minDuration + progressFactor * 2500; // Reduced base increase with progress
+            const randomDuration = Math.random() * (maxAdditionalDuration * progressFactor);
+            
+            // Mobile needs even longer durations towards the end to ensure they don't die out too quickly
+            const mobileFactor = isMobile ? (1 + progressFactor) : 1;
+            
+            // Reduce duration on low performance devices
+            const performanceFactor = isLowPerformanceDevice ? 0.7 : 1.0;
+            
+            networkPopups.push({
+                element: popup,
+                expires: Date.now() + (baseDuration + randomDuration) * mobileFactor * performanceFactor
+            });
+            
+            // Show with animation
+            setTimeout(() => {
+                popup.classList.add('visible');
+            }, 10);
+            
+            return popup;
+        }
+        
+        // Remove expired network popups - optimized version
+        function cleanupNetworkPopups() {
+            const now = Date.now();
+            const expiredPopups = [];
+            
+            // First, collect all expired popups without modifying the array
+            // This is more efficient than splicing in a loop
+            for (let i = networkPopups.length - 1; i >= 0; i--) {
+                const popup = networkPopups[i];
+                if (now > popup.expires) {
+                    expiredPopups.push({index: i, popup: popup});
+                }
+            }
+            
+            // Then handle all expired popups
+            if (expiredPopups.length > 0) {
+                // Start fade out animations
+                expiredPopups.forEach(({popup}) => {
+                    popup.element.classList.remove('visible');
+                    popup.element.classList.add('fading');
+                });
+                
+                // Schedule a single batch DOM removal
+                setTimeout(() => {
+                    expiredPopups.forEach(({popup}) => {
+                        if (popup.element.parentNode) {
+                            popup.element.parentNode.removeChild(popup.element);
+                        }
+                    });
+                }, 500);
+                
+                // Remove all expired popups from tracking array at once
+                // Sort indices in descending order to avoid index shifting issues
+                expiredPopups.sort((a, b) => b.index - a.index);
+                expiredPopups.forEach(({index}) => {
+                    networkPopups.splice(index, 1);
+                });
+            }
+        }
+        
+        // Track animation progress to increase network popup frequency
+        let animationProgress = 0; // 0 to 1 representing animation progress
+        let animationStartTime = 0;
+        let estimatedAnimationDuration = 0;
+        let lastNetworkPopupTime = 0; // Track last popup creation time for throttling
+        
+        // Performance optimization - detect if device is struggling
+        let frameTimeHistory = [];
+        let isLowPerformanceDevice = false;
+        
+        // Check device performance by monitoring frame times
+        function checkPerformance() {
+            const MAX_FRAME_TIME = 50; // ms (20 fps)
+            const HISTORY_SIZE = 10;
+            
+            // Calculate average frame time
+            if (frameTimeHistory.length >= HISTORY_SIZE) {
+                const avgFrameTime = frameTimeHistory.reduce((a, b) => a + b, 0) / frameTimeHistory.length;
+                
+                // If average frame time is too high, consider it a low performance device
+                isLowPerformanceDevice = avgFrameTime > MAX_FRAME_TIME;
+                
+                // Reset history after checking
+                frameTimeHistory = [];
+            }
+        }
+        
+        // Manage network popups during animation with performance optimizations
+        function manageNetworkPopups() {
+            // Only run if animation is active
+            if (!isAnimationRunning) return;
+            
+            // Track frame time for performance monitoring
+            const frameStart = performance.now();
+            
+            // Clean up expired popups - but not on every frame to improve performance
+            if (Math.random() < 0.2) { // Only clean up 20% of frames
+                cleanupNetworkPopups();
+            }
+            
+            // Calculate animation progress if we have a start time and estimated duration
+            if (animationStartTime > 0 && estimatedAnimationDuration > 0) {
+                const elapsed = Date.now() - animationStartTime;
+                animationProgress = Math.min(1, elapsed / estimatedAnimationDuration);
+                
+                // Log progress less frequently to reduce console overhead
+                if (Math.random() < 0.005) {
+                    console.log(`Animation progress: ${Math.round(animationProgress * 100)}%`);
+                }
+            }
+            
+            // Use a non-linear curve for progression - start very slow, accelerate towards the end
+            // This ensures network popups start slow and increase dramatically towards the end
+            // Using a power curve (x^3) for more dramatic effect
+            const progressCurve = Math.pow(animationProgress, 3);
+            
+            // Increase popup frequency based on animation progress
+            // Start with very low probability, increase to high probability
+            const baseChance = isMobile ? 0.1 : 0.2; // Even lower base chance
+            const maxChance = isMobile ? 0.5 : 0.4;   // Lower max chance to reduce CPU usage
+            const currentChance = baseChance + (maxChance - baseChance) * progressCurve; // Use curve for non-linear progression
+            
+            // Increase max popups allowed based on progress too - use curve for non-linear progression
+            // Start with very few popups, increase dramatically towards the end
+            const minPopupPercentage = isMobile ? 0.1 : 0.2; // Start with fewer on mobile
+            const currentMaxPopups = Math.floor(maxNetworkPopups * (minPopupPercentage + (1 - minPopupPercentage) * progressCurve));
+            
+            // Throttle popup creation based on time since last popup
+            const now = performance.now();
+            const minTimeBetweenPopups = isLowPerformanceDevice ? 300 : 200; // ms
+            const timeElapsed = now - lastNetworkPopupTime;
+            
+            // Add new popups if below current max, random chance hits, and enough time has passed
+            if (networkPopups.length < currentMaxPopups && 
+                Math.random() < currentChance && 
+                timeElapsed > minTimeBetweenPopups) {
+                createNetworkPopup();
+                lastNetworkPopupTime = now;
+            }
+            
+            // Track frame time for performance monitoring
+            const frameTime = performance.now() - frameStart;
+            frameTimeHistory.push(frameTime);
+            
+            // Check performance every 100 frames
+            if (frameTimeHistory.length >= 10) {
+                checkPerformance();
+            }
+            
+            // Continue checking - but use setTimeout instead of requestAnimationFrame
+            // This reduces the frequency of checks on low-performance devices
+            if (isLowPerformanceDevice) {
+                setTimeout(manageNetworkPopups, 100); // 10 fps for low performance
+            } else {
+                requestAnimationFrame(manageNetworkPopups);
+            }
+        }
+        
         function startViralAnimation() {
             if (isAnimationRunning) return;
             isAnimationRunning = true;
@@ -1223,6 +1593,41 @@
             
             // Hide any visible popups
             hideTweetPopup();
+            
+            // Clear any existing network popups
+            const networkContainer = document.getElementById('networkPopupsContainer');
+            networkContainer.innerHTML = '';
+            networkPopups.length = 0;
+            
+            // Reset animation progress tracking
+            animationProgress = 0;
+            animationStartTime = Date.now();
+            
+            // Estimate animation duration based on number of tweets and timing
+            // This is an approximation to help scale the network popup frequency
+            const tweetsToAnimate = sortedTweets.length;
+            const avgTimePerTweet = 3000; // Rough estimate in ms
+            estimatedAnimationDuration = tweetsToAnimate * avgTimePerTweet;
+            console.log(`Estimated animation duration: ${estimatedAnimationDuration/1000}s for ${tweetsToAnimate} tweets`);
+            
+            // Start showing network popups after 1.6 seconds as requested
+            console.log("Will create network popups after 1.6 seconds");
+            setTimeout(() => {
+                console.log("Creating initial network popups - starting with very few");
+                // Start with just a few popups (8% of max on mobile, 12% on desktop) - reduced for performance
+                const initialPercentage = isMobile ? 0.08 : 0.12;
+                const initialCount = Math.floor(maxNetworkPopups * initialPercentage);
+                
+                // Create initial popups with more staggering to reduce CPU spikes
+                for (let i = 0; i < initialCount; i++) {
+                    setTimeout(() => {
+                        createNetworkPopup();
+                    }, i * (isMobile ? 600 : 450)); // Even more staggered to reduce CPU load
+                }
+                
+                // Check device performance after initial popups
+                setTimeout(checkPerformance, 3000);
+            }, 1600); // Wait 1.6 seconds before starting
             
             // Create a new popup for animation
             const animPopup = document.createElement('div');
@@ -1235,6 +1640,9 @@
             const popupDuration = 2000; // How long each popup stays visible
             const transitionTime = 800; // Fade in/out time
             const pulseTime = 500; // Dot pulse animation time
+            
+            // Start network popup management
+            manageNetworkPopups();
             
             // Start animation sequence
             setTimeout(() => {
@@ -1362,16 +1770,31 @@
                 }, 100);
             }
             
-            function finishAnimation() {
-                // Clean up
-                if (animPopup.parentNode) {
-                    animPopup.parentNode.removeChild(animPopup);
+        function finishAnimation() {
+            // Clean up
+            if (animPopup.parentNode) {
+                animPopup.parentNode.removeChild(animPopup);
+            }
+            
+            // Set animation progress to complete
+            animationProgress = 1;
+            
+            // Allow network popups to continue for a short while after main animation ends
+            // Use a shorter duration on low performance devices
+            const extraTime = isLowPerformanceDevice ? 2000 : 4000;
+            
+            setTimeout(() => {
+                // Batch remove all network popups at once for better performance
+                const networkContainer = document.getElementById('networkPopupsContainer');
+                if (networkContainer) {
+                    // Use innerHTML = '' which is much faster than removing nodes individually
+                    networkContainer.innerHTML = '';
                 }
+                networkPopups.length = 0;
                 
                 isAnimationRunning = false;
-                
-                
-            }
+            }, extraTime);
+        }
         }
         
         // Initialize when the page loads
