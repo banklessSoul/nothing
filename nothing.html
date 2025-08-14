@@ -88,7 +88,7 @@
         /* Network effect popup styles - smaller and less opacity */
         .network-popup {
             position: absolute;
-            background-color: rgba(20, 20, 20, 0.5); /* Less opacity as requested */
+            background-color: rgba(20, 20, 20, 0.8);
             border-radius: 8px;
             padding: 10px;
             max-width: 220px; /* Smaller width */
@@ -99,7 +99,7 @@
             line-height: 1.3;
             z-index: 90; /* Lower z-index than main popups */
             display: block; /* Start visible */
-            border: 1px solid rgba(51, 51, 51, 0.3); /* Less visible border */
+            border: 1px solid rgba(51, 51, 51, 0.8); 
             transition: all 0.4s ease;
             opacity: 0;
             transform: scale(0.8);
@@ -116,8 +116,7 @@
         }
         
         .network-popup.visible {
-            opacity: 0.8; /* Less visible as requested */
-            /* Note: We're not setting transform:scale(1) here because we're using custom scaling for each popup */
+            opacity: 1; 
         }
         
         .network-popup.fading {
@@ -1322,7 +1321,7 @@
             popup.style.display = 'block'; // Ensure it's visible
             
             // Random size between 60% and 100% of original size
-            const sizeScale = 0.60 + Math.random() * 0.25;
+            const sizeScale = 0.50 + Math.random() * 0.25;
             
             // Use CSS transform for better performance
             popup.style.transform = `scale(${sizeScale})`;
@@ -1418,7 +1417,7 @@
             // Add to tracking array with duration that increases with animation progress
             // Early popups have shorter duration, later popups have longer duration
             // This ensures early popups die out quickly and later ones persist longer
-            const minDuration = 3000; // Base duration
+            const minDuration = 2500; // Base duration
             const maxAdditionalDuration = 2000; // Reduced maximum additional random duration
             
             // Calculate duration based on animation progress
@@ -1545,7 +1544,7 @@
             
             // Increase popup frequency based on animation progress
             // Start with very low probability, increase to high probability
-            const baseChance = isMobile ? 0.1 : 0.2; // Even lower base chance
+            const baseChance = isMobile ? 0.12 : 0.2; // Even lower base chance
             const maxChance = isMobile ? 0.5 : 0.4;   // Lower max chance to reduce CPU usage
             const currentChance = baseChance + (maxChance - baseChance) * progressCurve; // Use curve for non-linear progression
             
