@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Cast of Nothing</title>
+    <title>The Cinematic universe of Nothing</title>
     <style>
         body {
             margin: 0;
@@ -101,6 +101,7 @@
             align-items: center;
             z-index: 2;
             transition: transform 0.1s ease-out;
+            margin: 10px; /* Added margin to prevent cards from overlapping */
         }
         
         .node-details {
@@ -208,6 +209,9 @@
             border: 1px solid rgba(227, 220, 191, 0.5); /* Border with matching color */
             z-index: 0;
             backdrop-filter: blur(1px); /* Subtle blur effect */
+            margin: 10px; /* Small margin to prevent collision */
+            box-sizing: border-box; /* Include border in size calculation */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Subtle shadow for visual separation */
         }
         
         .group-label {
@@ -349,6 +353,71 @@
             display: none;
         }
         
+        /* Social links at bottom */
+        .social-logo {
+            position: fixed;
+            bottom: 20px;
+            width: 36px;
+            height: 36px;
+            z-index: 50;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+        }
+        
+        /* Footer area - keep this space clear */
+        .footer-area {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            z-index: 40;
+            pointer-events: none;
+        }
+        
+        .social-logo:hover {
+            opacity: 1;
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
+        }
+        
+        /* Container for logos to ensure they're centered as a group */
+        .logo-container {
+            position: fixed;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            z-index: 50;
+        }
+        
+        .social-logo {
+            position: relative;
+            bottom: auto;
+            left: auto;
+            transform: none;
+        }
+        
+        .social-logo:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Responsive styles for footer */
+        @media (max-width: 768px) {
+            .social-logo {
+                width: 28px;
+                height: 28px;
+            }
+            
+            .logo-container {
+                gap: 30px;
+            }
+        }
+        
         @keyframes pulsate {
             0% { opacity: 0.3; }
             50% { opacity: 0.6; }
@@ -431,7 +500,7 @@
     </div>
 
     <div class="board-header">
-        <h1 class="board-title">The Cast of Nothing</h1>
+        <h1 class="board-title">The Cinematic universe of Nothing</h1>
         <p class="board-instructions">Use mouse wheel or pinch to zoom. Click on an image for details. Press ↺ to reset view.</p>
     </div>
     
@@ -453,6 +522,22 @@
         <button class="control-btn" id="reset" title="Reset View">↺</button>
     </div>
 
+    <!-- Footer area -->
+    <div class="footer-area"></div>
+    
+    <!-- Social links in a centered container -->
+    <div class="logo-container">
+        <a href="https://x.com/i/communities/1847401123151564807" target="_blank" class="social-logo x-logo">
+            <svg viewBox="0 0 24 24" fill="#ffffff">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+        </a>
+        
+        <a href="https://dexscreener.com/solana/a4wp7fqicqztidakcxvdnzycuzjjcabyjdca7wmoqa1g" target="_blank" class="social-logo dex-logo">
+            <svg viewBox="0 0 252 252" fill="#ffffff"><path d="M151.818 106.866c9.177-4.576 20.854-11.312 32.545-20.541 2.465 5.119 2.735 9.586 1.465 13.193-.9 2.542-2.596 4.753-4.826 6.512-2.415 1.901-5.431 3.285-8.765 4.033-6.326 1.425-13.712.593-20.419-3.197m1.591 46.886l12.148 7.017c-24.804 13.902-31.547 39.716-39.557 64.859-8.009-25.143-14.753-50.957-39.556-64.859l12.148-7.017a5.95 5.95 0 003.84-5.845c-1.113-23.547 5.245-33.96 13.821-40.498 3.076-2.342 6.434-3.518 9.747-3.518s6.671 1.176 9.748 3.518c8.576 6.538 14.934 16.951 13.821 40.498a5.95 5.95 0 003.84 5.845zM126 0c14.042.377 28.119 3.103 40.336 8.406 8.46 3.677 16.354 8.534 23.502 14.342 3.228 2.622 5.886 5.155 8.814 8.071 7.897.273 19.438-8.5 24.796-16.709-9.221 30.23-51.299 65.929-80.43 79.589-.012-.005-.02-.012-.029-.018-5.228-3.992-11.108-5.988-16.989-5.988s-11.76 1.996-16.988 5.988c-.009.005-.017.014-.029.018-29.132-13.66-71.209-49.359-80.43-79.589 5.357 8.209 16.898 16.982 24.795 16.709 2.929-2.915 5.587-5.449 8.814-8.071C69.31 16.94 77.204 12.083 85.664 8.406 97.882 3.103 111.959.377 126 0m-25.818 106.866c-9.176-4.576-20.854-11.312-32.544-20.541-2.465 5.119-2.735 9.586-1.466 13.193.901 2.542 2.597 4.753 4.826 6.512 2.416 1.901 5.432 3.285 8.766 4.033 6.326 1.425 13.711.593 20.418-3.197"></path><path d="M197.167 75.016c6.436-6.495 12.107-13.684 16.667-20.099l2.316 4.359c7.456 14.917 11.33 29.774 11.33 46.494l-.016 26.532.14 13.754c.54 33.766 7.846 67.929 24.396 99.193l-34.627-27.922-24.501 39.759-25.74-24.231L126 299.604l-41.132-66.748-25.739 24.231-24.501-39.759L0 245.25c16.55-31.264 23.856-65.427 24.397-99.193l.14-13.754-.016-26.532c0-16.721 3.873-31.578 11.331-46.494l2.315-4.359c4.56 6.415 10.23 13.603 16.667 20.099l-2.01 4.175c-3.905 8.109-5.198 17.176-2.156 25.799 1.961 5.554 5.54 10.317 10.154 13.953 4.48 3.531 9.782 5.911 15.333 7.161 3.616.814 7.3 1.149 10.96 1.035-.854 4.841-1.227 9.862-1.251 14.978L53.2 160.984l25.206 14.129a41.926 41.926 0 015.734 3.869c20.781 18.658 33.275 73.855 41.861 100.816 8.587-26.961 21.08-82.158 41.862-100.816a41.865 41.865 0 015.734-3.869l25.206-14.129-32.665-18.866c-.024-5.116-.397-10.137-1.251-14.978 3.66.114 7.344-.221 10.96-1.035 5.551-1.25 10.854-3.63 15.333-7.161 4.613-3.636 8.193-8.399 10.153-13.953 3.043-8.623 1.749-17.689-2.155-25.799l-2.01-4.175z"></path></svg>
+        </a>
+    </div>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Board elements
@@ -1151,21 +1236,29 @@
                 const settings = {};
                 const boardCenterX = 1000; // Center of the board
                 const boardCenterY = 750;  // Center of the board
-                const radius = 450; // Distance from center to group center
                 
                 // Filter out "Origin" as it shouldn't be displayed as a group
                 const displayGroups = groups.filter(group => group !== "Origin");
                 
-                // Position groups in a circle around the center
+                // Calculate appropriate radius based on group count - reduced to bring groups closer to center
+                const baseRadius = 380; // Significantly reduced radius to bring groups closer to center
+                const groupCount = displayGroups.length;
+                const radius = baseRadius + (groupCount > 3 ? (groupCount - 3) * 30 : 0); // Less spacing for additional groups
+                
+                // Adjust group size based on count
+                const groupWidth = groupCount > 4 ? 410 : 430; // Slightly larger width
+                const groupHeight = groupCount > 4 ? 310 : 330; // Slightly larger height
+                
+                // Position groups in a circle around the center with adjusted spacing
                 displayGroups.forEach((group, index) => {
                     const angle = (index / displayGroups.length) * 2 * Math.PI; // Distribute evenly
-                    const x = boardCenterX + radius * Math.cos(angle) - 225; // Offset for width
-                    const y = boardCenterY + radius * Math.sin(angle) - 175; // Offset for height
+                    const x = boardCenterX + radius * Math.cos(angle) - (groupWidth / 2); // Center aligned
+                    const y = boardCenterY + radius * Math.sin(angle) - (groupHeight / 2); // Center aligned
                     
                     settings[group] = {
                         position: { x, y },
-                        width: 450,
-                        height: 350
+                        width: groupWidth,
+                        height: groupHeight
                     };
                 });
                 
