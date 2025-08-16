@@ -473,6 +473,11 @@
                             setTimeout(function() {
                                 enterDialog.style.display = 'block';
 
+                                const cast = document.getElementById('cast');
+                                casr.addEventListener('click', function() {
+                                    window.location.href = '/cast.html';
+                                })
+
                                 const lore = document.getElementById('lore');
                                 lore.addEventListener('click', function() {
                                     window.location.href = '/lore.html';
@@ -491,6 +496,7 @@
     </script>
     <!-- Enter dialog that appears after posting -->
     <div class="enter-dialog" id="enterDialog">
+        <div class="enter-text" id="cast">Cast</div>
         <div class="enter-text" id="lore">Lore</div>
         <div class="enter-text" id="join">𒐪</div>
     </div>
