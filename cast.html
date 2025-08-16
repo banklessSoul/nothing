@@ -90,8 +90,8 @@
             height: 1500px;
             background: transparent; /* Make this transparent to show body background */
             transform-origin: center center;
-            margin-bottom: 100px; /* Add margin at the bottom to ensure groups are visible */
-            padding-bottom: 100px; /* Extra padding to ensure content doesn't get cut off */
+            margin-bottom: 200px; /* Increased margin at the bottom to ensure groups are visible */
+            padding-bottom: 200px; /* Increased padding to ensure content doesn't get cut off */
         }
         
         .image-container {
@@ -432,7 +432,7 @@
 
     <div class="board-header">
         <h1 class="board-title">The Cast of Nothing</h1>
-        <p class="board-instructions">Use +/- buttons or pinch to zoom. Click on an image for details. Tap on 'Groups' to focus on specific groups.</p>
+        <p class="board-instructions">Use mouse wheel or pinch to zoom. Click on an image for details. Press ↺ to reset view.</p>
     </div>
     
     <div class="overlay" id="overlay"></div>
@@ -450,14 +450,7 @@
     </div>
     
     <div class="controls">
-        <button class="control-btn" id="zoom-in" title="Zoom In">+</button>
-        <button class="control-btn" id="zoom-out" title="Zoom Out">-</button>
         <button class="control-btn" id="reset" title="Reset View">↺</button>
-    </div>
-    
-    <div class="group-menu">
-        <button class="group-menu-btn" id="group-menu-btn">Groups</button>
-        <div class="group-dropdown" id="group-dropdown"></div>
     </div>
 
     <script>
@@ -467,12 +460,8 @@
             const boardContainer = document.getElementById('board-container');
             const zoomFocus = document.getElementById('zoom-focus');
             
-            // Control buttons
-            const zoomInBtn = document.getElementById('zoom-in');
-            const zoomOutBtn = document.getElementById('zoom-out');
+            // Control button
             const resetBtn = document.getElementById('reset');
-            const groupMenuBtn = document.getElementById('group-menu-btn');
-            const groupDropdown = document.getElementById('group-dropdown');
             
             // Board state
             let scale = 1;
@@ -500,14 +489,20 @@
                 try {
                     // Add timestamp to prevent caching
                     const timestamp = new Date().getTime();
+                    console.log("Fetching data from nodes-data.json");
                     const response = await fetch(`nodes-data.json?t=${timestamp}`);
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
                     const data = await response.json();
+                    console.log("Data loaded successfully:", data.length, "nodes");
                     return data;
                 } catch (error) {
                     console.error("Could not load data: ", error);
+                    document.getElementById('loading-overlay').innerHTML = `
+                        <p>Error loading the investigation board data.</p>
+                        <p>${error.message}</p>
+                    `;
                     // Return a fallback data structure if the fetch fails
                     return [];
                 }
@@ -718,15 +713,7 @@
                         
                         container.appendChild(label);
                         
-                        // Add zoom button to each group
-                        const zoomBtn = document.createElement('button');
-                        zoomBtn.className = 'zoom-to-group';
-                        zoomBtn.textContent = 'Focus';
-                        zoomBtn.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            zoomToGroup(groupKey);
-                        });
-                        container.appendChild(zoomBtn);
+                        // Focus button removed per user request
                         
                         // Add to board
                         board.appendChild(container);
@@ -988,17 +975,7 @@
                     translateY = Math.min(maxY, Math.max(currentMinY, translateY));
                 }
                 
-                // Zoom controls
-                zoomInBtn.addEventListener('click', () => {
-                    scale = Math.min(scale * 1.2, 5);
-                    updateBoardTransform();
-                });
-                
-                zoomOutBtn.addEventListener('click', () => {
-                    scale = Math.max(scale / 1.2, 0.3);
-                    updateBoardTransform();
-                });
-                
+                // Reset control
                 resetBtn.addEventListener('click', () => {
                     scale = 0.8; // Reset to initial zoom
                     initializeBoard();
@@ -1231,55 +1208,10 @@
                 }, 2000);
             }
             
-            // Setup group selection dropdown
+            // Placeholder for setupGroupMenu (removed as requested)
             function setupGroupMenu(groups) {
-                // Clear existing dropdown
-                groupDropdown.innerHTML = '';
-                
-                // Add "All Groups" option
-                const allButton = document.createElement('button');
-                allButton.textContent = 'All Groups';
-                allButton.addEventListener('click', () => {
-                    // Reset to default view
-                    scale = 0.8;
-                    initializeBoard();
-                    
-                    // Hide dropdown
-                    groupDropdown.style.display = 'none';
-                });
-                groupDropdown.appendChild(allButton);
-                
-                // Add each group option
-                groups.forEach(groupName => {
-                    if (groupName === 'Origin') return; // Skip Origin group
-                    
-                    const groupButton = document.createElement('button');
-                    groupButton.textContent = groupName;
-                    groupButton.addEventListener('click', () => {
-                        zoomToGroup(groupName);
-                        
-                        // Hide dropdown
-                        groupDropdown.style.display = 'none';
-                    });
-                    
-                    groupDropdown.appendChild(groupButton);
-                });
-                
-                // Toggle dropdown on button click
-                groupMenuBtn.addEventListener('click', () => {
-                    if (groupDropdown.style.display === 'block') {
-                        groupDropdown.style.display = 'none';
-                    } else {
-                        groupDropdown.style.display = 'block';
-                    }
-                });
-                
-                // Close dropdown when clicking elsewhere
-                document.addEventListener('click', (e) => {
-                    if (!groupMenuBtn.contains(e.target) && !groupDropdown.contains(e.target)) {
-                        groupDropdown.style.display = 'none';
-                    }
-                });
+                // Group menu functionality removed as requested
+                return;
             }
             
             // Initialize the board
@@ -1314,6 +1246,7 @@
                     initializeZoomAndPan();
                     
                     // Hide loading overlay
+                    console.log("Board initialization complete. Hiding loading overlay.");
                     setTimeout(() => {
                         document.getElementById('loading-overlay').style.display = 'none';
                     }, 500);
@@ -1322,6 +1255,7 @@
                     document.getElementById('loading-overlay').innerHTML = `
                         <p>Error loading the investigation board.</p>
                         <p>${error.message}</p>
+                        <button onclick="location.reload()" style="margin-top: 20px; padding: 10px 20px; background-color: #ff0000; color: white; border: none; cursor: pointer; border-radius: 5px;">Reload Page</button>
                     `;
                 }
             }
@@ -1353,25 +1287,19 @@
                     });
                 }
                 
-                // Set description
-                const description = nodeData.description || 
-                    `Subject ${nodeData.node} is connected to ${
-                        (nodeData.groups && nodeData.groups.length > 0) ? 
-                        nodeData.groups.join(', ') : 'no specific groups'
-                    }.`;
-                    
-                detailDescription.textContent = description;
+                // Clear previous description
+                detailDescription.textContent = '';
                 
+                // Only add the profile link per user request
                 if (nodeData.link) {
-                    // Add link to profile if available
                     const linkPara = document.createElement('p');
                     const linkAnchor = document.createElement('a');
                     linkAnchor.href = nodeData.link;
                     linkAnchor.textContent = "View Profile";
                     linkAnchor.target = "_blank";
                     linkAnchor.style.color = "#ff6666";
+                    linkPara.style.textAlign = "center";
                     linkPara.appendChild(linkAnchor);
-                    detailDescription.appendChild(document.createElement('br'));
                     detailDescription.appendChild(linkPara);
                 }
                 
