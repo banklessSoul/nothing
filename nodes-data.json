@@ -1,0 +1,92 @@
+[
+    {
+        "node": "nocturnmachine",
+        "image": "https://pbs.twimg.com/profile_images/1913246006222733312/v0Z9-mdf_400x400.jpg",
+        "link": "https://x.com/nocturnmachine",
+        "groups": ["Art"]
+    },
+    {
+        "node": "miniarchillect",
+        "image": "https://pbs.twimg.com/profile_images/1872776618432991232/SjdVJCZX_400x400.jpg",
+        "link": "https://x.com/miniarchillect",
+        "groups": ["Art"]
+    },
+    {
+        "node": "SHL0MS",
+        "image": "https://pbs.twimg.com/profile_images/1920126904994082816/EBFBcYtO_400x400.png",
+        "link": "https://x.com/SHL0MS",
+        "groups": ["Origin"]
+    },
+    {
+        "node": "solisolsoli",
+        "image": "https://pbs.twimg.com/profile_images/1240651592560513027/6fstVHAy_400x400.jpg",
+        "link": "https://x.com/solisolsoli",
+        "groups": ["Art"]
+    },
+    {
+        "node": "Everything",
+        "image": "https://pbs.twimg.com/profile_images/1845179276779536384/0p6ToUxn_400x400.jpg",
+        "link": "https://x.com/isjuustadream",
+        "groups": ["Awakening"]
+    },
+    {
+        "node": "The Fourth Way",
+        "image": "https://pbs.twimg.com/profile_images/1895515767040249856/-T42XOFm_400x400.jpg",
+        "link": "https://x.com/The4thWayYT",
+        "groups": ["Awakening"]
+    },
+    {
+        "node": "𝗘𝗟🐕⚒️👁️⃤",
+        "image": "https://pbs.twimg.com/profile_images/1939401411936059392/OkbKecIx_400x400.jpg",
+        "link": "https://x.com/MatrixMischief",
+        "groups": ["Awakening"]
+    },
+    {
+        "node": "★",
+        "image": "https://pbs.twimg.com/profile_images/1911529260403064832/DBsn3a2C_400x400.jpg",
+        "link": "https://x.com/thematrixwizard",
+        "groups": ["Awakening"]
+    },
+    {
+        "node": "Satan",
+        "image": "https://pbs.twimg.com/profile_images/1880278672222916608/xIG6V6Rn_400x400.jpg",
+        "link": "https://x.com/s8n",
+        "groups": ["Memes"]
+    },
+    {
+        "node": "God",
+        "image": "https://pbs.twimg.com/profile_images/1880403110893400065/iMwI-2m-_400x400.jpg",
+        "link": "https://x.com/god",
+        "groups": ["AI Agents"]
+    },
+    {
+        "node": "Jesus Christ",
+        "image": "https://pbs.twimg.com/profile_images/1881563058171949056/nJ7KbHX__400x400.jpg",
+        "link": "https://x.com/jesuschrist",
+        "groups": ["AI Agents"]
+    },
+    {
+        "node": "The Pope",
+        "image": "https://pbs.twimg.com/profile_images/1924526527825227776/jbZMnWJc_400x400.jpg",
+        "link": "https://x.com/thepope",
+        "groups": ["AI Agents"]
+    },
+    {
+        "node": "Roaring Kitty",
+        "image": "https://pbs.twimg.com/profile_images/1264272607827935232/otFf0o7r_400x400.jpg",
+        "link": "https://x.com/TheRoaringKitty",
+        "groups": ["Degen"]
+    },
+    {
+        "node": "Polymarket",
+        "image": "https://pbs.twimg.com/profile_images/1789484330638561280/t4Js9UFO_400x400.jpg",
+        "link": "https://x.com/Polymarket",
+        "groups": ["Degen"]
+    },
+    {
+        "node": "ye",
+        "image": "https://pbs.twimg.com/profile_images/1885922338983579649/W-5uks-5_400x400.jpg",
+        "link": "https://x.com/kanyewest",
+        "groups": ["Degen"]
+    }
+]
