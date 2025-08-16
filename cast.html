@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Cast of Nothing</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+            background-image: url('https://images.prismic.io/mda-corp/37eb99a9-7b8c-4278-bf27-2754da0b7b15_Carousel+2.jpg');
+            background-size: cover;
+            background-position: center center;
+            background-attachment: fixed;
+            color: white;
+        }
+        
+        .board-header {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(30, 30, 30, 0.9);
+            padding: 10px 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            z-index: 100;
+            max-width: 80%;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .board-title {
+            margin: 0;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .board-instructions {
+            margin: 0;
+            font-size: 12px;
+            color: #ccc;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        
+        .loading-spinner {
+            border: 6px solid #333;
+            border-top: 6px solid #ff0000;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        #board-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        #investigation-board {
+            position: absolute;
+            width: 2000px;
+            height: 1500px;
+            background: transparent; /* Make this transparent to show body background */
+            transform-origin: center center;
+            margin-bottom: 100px; /* Add margin at the bottom to ensure groups are visible */
+            padding-bottom: 100px; /* Extra padding to ensure content doesn't get cut off */
+        }
+        
+        .image-container {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 2;
+            transition: transform 0.1s ease-out;
+        }
+        
+        .node-details {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(30, 30, 30, 0.95);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            z-index: 200;
+            max-width: 80%;
+            display: none;
+            border: 1px solid rgba(255, 0, 0, 0.5);
+        }
+        
+        .node-details img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 15px;
+            border: 3px solid #fff;
+        }
+        
+        .node-details h2 {
+            margin-top: 0;
+            border-bottom: 2px solid rgba(255, 0, 0, 0.7);
+            padding-bottom: 10px;
+            color: white;
+        }
+        
+        .node-details .groups-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin: 10px 0;
+        }
+        
+        .node-details .group-tag {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            background-color: rgba(180, 20, 20, 0.7);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .close-details {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: white;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 199;
+            display: none;
+        }
+        
+        .mugshot {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 5%;
+            border: 3px solid white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            transition: transform 0.2s;
+            transform: rotate(-2deg);
+        }
+        
+        .mugshot:hover {
+            transform: scale(1.05) rotate(0deg);
+            z-index: 5;
+        }
+        
+        .image-caption {
+            margin-top: 8px;
+            background-color: #fff;
+            color: #000;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            max-width: 150px;
+            text-align: center;
+            transform: rotate(1deg);
+        }
+        
+        .group-container {
+            position: absolute;
+            border-radius: 15px;
+            background-color: rgba(227, 220, 191, 0.3); /* Changed to #e3dcbf with some transparency */
+            border: 1px solid rgba(227, 220, 191, 0.5); /* Border with matching color */
+            z-index: 0;
+            backdrop-filter: blur(1px); /* Subtle blur effect */
+        }
+        
+        .group-label {
+            position: absolute;
+            background-color: #fff;
+            color: #000;
+            padding: 3px 8px;
+            border-radius: 2px;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            text-transform: uppercase;
+            transform: rotate(-1deg);
+            z-index: 1; /* Ensure label is above group container */
+        }
+        
+        .thread {
+            position: absolute;
+            height: 2px;
+            background-color: #ff0000;
+            transform-origin: 0 0;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.8;
+            box-shadow: 0 0 3px rgba(255, 0, 0, 0.5);
+        }
+        
+        .pushpin {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #ff0000;
+            box-shadow: 0 0 2px rgba(0,0,0,0.5);
+            z-index: 3;
+            border: 1px solid rgba(0,0,0,0.3);
+        }
+        
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+        
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: rgba(50, 50, 50, 0.9);
+            color: white;
+            border: 1px solid rgba(255, 0, 0, 0.5);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Enhanced for better mobile experience */
+        @media (max-width: 768px) {
+            .mugshot {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .image-caption {
+                font-size: 10px;
+                max-width: 100px;
+            }
+            
+            .board-header {
+                max-width: 90%;
+                padding: 8px;
+            }
+            
+            .board-title {
+                font-size: 16px;
+            }
+            
+            .board-instructions {
+                font-size: 10px;
+            }
+            
+            .control-btn {
+                width: 45px;
+                height: 45px;
+                font-size: 22px;
+            }
+            
+            .group-label {
+                font-size: 12px;
+            }
+            
+            /* Make controls more accessible on mobile */
+            .controls {
+                bottom: 15px;
+                right: 15px;
+            }
+            
+            /* Better tap targets for mobile */
+            .mugshot {
+                border-width: 2px;
+            }
+        }
+        
+        /* Extra small screens */
+        @media (max-width: 480px) {
+            .controls {
+                bottom: 10px;
+                right: 10px;
+                gap: 8px;
+            }
+            
+            .control-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+            
+            .mugshot {
+                width: 50px;
+                height: 50px;
+            }
+        }
+        
+        /* Visual indicators for zoom focus */
+        .zoom-focus {
+            position: absolute;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            pointer-events: none;
+            z-index: 50;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+            animation: pulsate 2s infinite ease-in-out;
+            display: none;
+        }
+        
+        @keyframes pulsate {
+            0% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+            100% { opacity: 0.3; }
+        }
+        
+        .zoom-to-group {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background-color: rgba(50, 50, 50, 0.8);
+            color: white;
+            border: 1px solid rgba(255, 0, 0, 0.5);
+            padding: 3px 6px;
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 3px;
+            z-index: 5;
+        }
+        
+        /* Group selection menu for mobile */
+        .group-menu {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 100;
+        }
+        
+        .group-menu-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: rgba(50, 50, 50, 0.9);
+            color: white;
+            border: 1px solid rgba(255, 0, 0, 0.5);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .group-dropdown {
+            position: absolute;
+            bottom: 60px;
+            left: 0;
+            background-color: rgba(30, 30, 30, 0.95);
+            border: 1px solid rgba(255, 0, 0, 0.5);
+            border-radius: 5px;
+            padding: 10px;
+            display: none;
+            max-height: 200px;
+            overflow-y: auto;
+            width: 150px;
+        }
+        
+        .group-dropdown button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 8px;
+            margin: 5px 0;
+            background-color: rgba(50, 50, 50, 0.8);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        .group-dropdown button:hover {
+            background-color: rgba(80, 80, 80, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p>Loading ...</p>
+    </div>
+
+    <div class="board-header">
+        <h1 class="board-title">The Cast of Nothing</h1>
+        <p class="board-instructions">Use +/- buttons or pinch to zoom. Click on an image for details. Tap on 'Groups' to focus on specific groups.</p>
+    </div>
+    
+    <div class="overlay" id="overlay"></div>
+    <div class="node-details" id="node-details">
+        <button class="close-details" id="close-details">&times;</button>
+        <h2 id="detail-name"></h2>
+        <img id="detail-image" src="" alt="">
+        <div class="groups-list" id="detail-groups"></div>
+        <p id="detail-description"></p>
+    </div>
+    
+    <div id="board-container">
+        <div id="investigation-board"></div>
+        <div class="zoom-focus" id="zoom-focus"></div>
+    </div>
+    
+    <div class="controls">
+        <button class="control-btn" id="zoom-in" title="Zoom In">+</button>
+        <button class="control-btn" id="zoom-out" title="Zoom Out">-</button>
+        <button class="control-btn" id="reset" title="Reset View">↺</button>
+    </div>
+    
+    <div class="group-menu">
+        <button class="group-menu-btn" id="group-menu-btn">Groups</button>
+        <div class="group-dropdown" id="group-dropdown"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Board elements
+            const board = document.getElementById('investigation-board');
+            const boardContainer = document.getElementById('board-container');
+            const zoomFocus = document.getElementById('zoom-focus');
+            
+            // Control buttons
+            const zoomInBtn = document.getElementById('zoom-in');
+            const zoomOutBtn = document.getElementById('zoom-out');
+            const resetBtn = document.getElementById('reset');
+            const groupMenuBtn = document.getElementById('group-menu-btn');
+            const groupDropdown = document.getElementById('group-dropdown');
+            
+            // Board state
+            let scale = 1;
+            let translateX = 0;
+            let translateY = 0;
+            let startPanX = 0;
+            let startPanY = 0;
+            let isPanning = false;
+            let groupPositions = {};
+            
+            // Color palette for threads and pushpins (red shades)
+            const colorPalette = [
+                "#ff0000", // Red
+                "#e60000", // Darker red
+                "#ff3333", // Lighter red
+                "#cc0000", // Deep red
+                "#ff1a1a"  // Bright red
+            ];
+            
+            // These will be populated dynamically based on the data
+            let groupSettings = {};
+            
+            // Load and parse JSON data
+            async function loadData() {
+                try {
+                    // Add timestamp to prevent caching
+                    const timestamp = new Date().getTime();
+                    const response = await fetch(`nodes-data.json?t=${timestamp}`);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    return data;
+                } catch (error) {
+                    console.error("Could not load data: ", error);
+                    // Return a fallback data structure if the fetch fails
+                    return [];
+                }
+            }
+            
+            // Reorganize data by groups for processing
+            function organizeDataByGroups(data) {
+                // Create a map of groups and their nodes
+                const groups = {};
+                
+                // Initialize all known groups from groupSettings
+                Object.keys(groupSettings).forEach(groupKey => {
+                    groups[groupKey] = [];
+                });
+                
+                // Process each node and add to all relevant groups
+                data.forEach(node => {
+                    if (node.groups && node.groups.length > 0) {
+                        node.groups.forEach(groupKey => {
+                            if (!groups[groupKey]) {
+                                groups[groupKey] = [];
+                            }
+                            groups[groupKey].push(node);
+                        });
+                    }
+                });
+                
+                return groups;
+            }
+            
+            // Initialize board position
+            function initializeBoard() {
+                // Center the board initially
+                translateX = (boardContainer.clientWidth) / 2 - 1000;
+                translateY = (boardContainer.clientHeight) / 2 - 750;
+                
+                // Set initial zoom
+                scale = 0.8;
+                updateBoardTransform();
+            }
+          
+            // Update the board's transformation
+            function updateBoardTransform() {
+                board.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+            }
+            
+            // Create an image element on the board
+            function createImageElement(data, imageUrl, position) {
+                const container = document.createElement('div');
+                container.className = 'image-container';
+                container.dataset.node = data.node;
+                container.style.left = `${position.x}px`;
+                container.style.top = `${position.y}px`;
+                
+                // Add slight random rotation for authentic look
+                const rotation = Math.random() * 6 - 3; // -3 to +3 degrees
+                
+                const img = document.createElement('img');
+                img.className = 'mugshot';
+                img.src = imageUrl;
+                img.alt = data.node;
+                img.style.transform = `rotate(${rotation}deg)`;
+                
+                // Make Origin node 1.5x bigger
+                if (data.groups && data.groups.includes("Origin")) {
+                    img.style.width = "120px";
+                    img.style.height = "120px";
+                    img.style.borderWidth = "5px";
+                }
+                
+                // Add click event for node details
+                img.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    showNodeDetails(data, imageUrl);
+                });
+                
+                const caption = document.createElement('div');
+                caption.className = 'image-caption';
+                caption.textContent = data.node;
+                // Rotate caption in the opposite direction
+                caption.style.transform = `rotate(${-rotation/2}deg)`;
+                
+                // Make Origin node caption bigger
+                if (data.groups && data.groups.includes("Origin")) {
+                    caption.style.fontSize = "16px";
+                    caption.style.fontWeight = "bold";
+                    caption.style.maxWidth = "200px";
+                    caption.style.padding = "7px 12px";
+                }
+                
+                // Add pushpin at the top of image
+                const pushpin = document.createElement('div');
+                pushpin.className = 'pushpin';
+                
+                // Adjust pushpin position for Origin node (which is larger)
+                if (data.groups && data.groups.includes("Origin")) {
+                    pushpin.style.left = `${60 - 5}px`; // Center of larger image (120px/2 - 5px)
+                    pushpin.style.width = '14px'; // Larger pushpin
+                    pushpin.style.height = '14px'; // Larger pushpin
+                } else {
+                    pushpin.style.left = `${40 - 5}px`; // Center of standard image (80px/2 - 5px)
+                }
+                pushpin.style.top = '-5px';
+                
+                // Randomize pushpin colors from red palette
+                const randomColorIndex = Math.floor(Math.random() * colorPalette.length);
+                pushpin.style.backgroundColor = colorPalette[randomColorIndex];
+                
+                container.appendChild(pushpin);
+                container.appendChild(img);
+                container.appendChild(caption);
+                
+                return container;
+            }
+            
+            // Create group containers and position nodes
+            function createGroupContainers(nodeData) {
+                const elementPositions = {};
+                const createdNodeIds = new Set(); // Track created nodes
+                
+                // Handle Origin node specially
+                const originNodes = getNodesInGroup(nodeData, "Origin");
+                if (originNodes.length > 0) {
+                    // Place Origin at the center of the board
+                    const originNode = originNodes[0];
+                    const originPosition = {
+                        x: 1000 - 60, // Center X, adjusted for larger node width (120px/2)
+                        y: 750 - 60   // Center Y, adjusted for larger node height (120px/2)
+                    };
+                    
+                    // Create the visual element
+                    const imageElement = createImageElement(originNode, originNode.image, originPosition);
+                    board.appendChild(imageElement);
+                    
+                    // Mark this node as created and store its position
+                    createdNodeIds.add(originNode.node);
+                    elementPositions[originNode.node] = originPosition;
+                }
+                
+                // First, organize data by groups
+                const groupedData = organizeDataByGroups(nodeData);
+                
+                // Create group containers
+                Object.keys(groupSettings).forEach(groupKey => {
+                    if (groupedData[groupKey] && groupedData[groupKey].length > 0) {
+                        const groupSetting = groupSettings[groupKey];
+                        
+                        // Get group dimensions
+                        const x = groupSetting.position.x;
+                        const y = groupSetting.position.y;
+                        const width = groupSetting.width;
+                        const height = groupSetting.height;
+                        
+                        // Create group container
+                        const container = document.createElement('div');
+                        container.className = 'group-container';
+                        container.id = `group-${groupKey}`;
+                        container.style.left = `${x}px`;
+                        container.style.top = `${y}px`;
+                        container.style.width = `${width}px`;
+                        container.style.height = `${height}px`;
+                        
+                        // Store position for zooming functionality
+                        groupPositions[groupKey] = {
+                            x: x,
+                            y: y,
+                            width: width,
+                            height: height,
+                            centerX: x + width/2,
+                            centerY: y + height/2
+                        };
+                        
+                        // Add group label - position it relative to the origin
+                        const label = document.createElement('div');
+                        label.className = 'group-label';
+                        label.textContent = groupKey;
+                        
+                        // Position label based on where the group is relative to the origin (1000, 750)
+                        const originX = 1000;
+                        const originY = 750;
+                        const groupCenterX = x + width/2;
+                        const groupCenterY = y + height/2;
+                        
+                        // Calculate position relative to origin
+                        if (groupCenterX < originX && groupCenterY < originY) {
+                            // Top left quadrant
+                            label.style.top = 'auto';
+                            label.style.bottom = '-25px';
+                            label.style.left = 'auto';
+                            label.style.right = '10px';
+                        } else if (groupCenterX >= originX && groupCenterY < originY) {
+                            // Top right quadrant
+                            label.style.top = 'auto';
+                            label.style.bottom = '-25px';
+                            label.style.left = '10px';
+                            label.style.right = 'auto';
+                        } else if (groupCenterX < originX && groupCenterY >= originY) {
+                            // Bottom left quadrant
+                            label.style.top = '-25px';
+                            label.style.left = 'auto';
+                            label.style.right = '10px';
+                        } else {
+                            // Bottom right quadrant (AI agents would be here)
+                            label.style.top = '-25px';
+                            label.style.left = '10px';
+                            label.style.right = 'auto';
+                        }
+                        
+                        container.appendChild(label);
+                        
+                        // Add zoom button to each group
+                        const zoomBtn = document.createElement('button');
+                        zoomBtn.className = 'zoom-to-group';
+                        zoomBtn.textContent = 'Focus';
+                        zoomBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            zoomToGroup(groupKey);
+                        });
+                        container.appendChild(zoomBtn);
+                        
+                        // Add to board
+                        board.appendChild(container);
+                        
+                        // Store group boundaries
+                        elementPositions[`group-${groupKey}`] = {
+                            left: x,
+                            top: y,
+                            right: x + width,
+                            bottom: y + height,
+                            centerX: x + width/2,
+                            centerY: y + height/2
+                        };
+                    }
+                });
+                
+                // Place nodes in groups
+                Object.keys(groupedData).forEach(groupKey => {
+                    const groupSetting = groupSettings[groupKey];
+                    if (!groupSetting) return; // Skip groups without settings
+                    
+                    const groupData = groupedData[groupKey];
+                    
+                    // Get group dimensions
+                    const x = groupSetting.position.x;
+                    const y = groupSetting.position.y;
+                    const width = groupSetting.width;
+                    const height = groupSetting.height;
+                    
+                    // Calculate positions for nodes in a grid-like arrangement
+                    const nodeCount = groupData.length;
+                    const columns = Math.ceil(Math.sqrt(nodeCount));
+                    const horizontalPadding = width / (columns + 1);
+                    const verticalPadding = height / (Math.ceil(nodeCount / columns) + 1);
+                    
+                    // Create elements for nodes in this group
+                    groupData.forEach((item, index) => {
+                        // Skip if we already created this node
+                        const nodeId = item.node;
+                        
+                        if (createdNodeIds.has(nodeId)) return;
+                        
+                        // Check if node belongs to multiple groups
+                        const allGroups = item.groups || [];
+                        
+                        let position;
+                        
+                        if (allGroups.length > 1) {
+                            // Skip Origin group for intersection calculations
+                            const relevantGroups = allGroups.filter(g => g !== "Origin");
+                            
+                            if (relevantGroups.length < 2) {
+                                // If there's only one group left after removing "Origin", treat as single group
+                                const group = relevantGroups[0];
+                                const groupSetting = groupSettings[group];
+                                
+                                if (groupSetting) {
+                                    const row = Math.floor(index / columns);
+                                    const col = index % columns;
+                                    
+                                    // Add slight random offset for natural look
+                                    const randOffsetX = (Math.random() * 20) - 10;
+                                    const randOffsetY = (Math.random() * 20) - 10;
+                                    
+                                    position = {
+                                        x: x + horizontalPadding * (col + 1) - 40 + randOffsetX,
+                                        y: y + verticalPadding * (row + 1) - 40 + randOffsetY
+                                    };
+                                } else {
+                                    // Fallback position
+                                    position = {
+                                        x: 1000 - 40,
+                                        y: 750 - 40
+                                    };
+                                }
+                            } else {
+                                // Calculate the intersection area of groups
+                                let intersectionBox = null;
+                                
+                                relevantGroups.forEach(g => {
+                                    if (!groupSettings[g]) return;
+                                    
+                                    const groupBox = {
+                                        left: groupSettings[g].position.x,
+                                        top: groupSettings[g].position.y,
+                                        right: groupSettings[g].position.x + groupSettings[g].width,
+                                        bottom: groupSettings[g].position.y + groupSettings[g].height
+                                    };
+                                    
+                                    // Initialize or update intersection
+                                    if (!intersectionBox) {
+                                        intersectionBox = {...groupBox};
+                                    } else {
+                                        intersectionBox.left = Math.max(intersectionBox.left, groupBox.left);
+                                        intersectionBox.top = Math.max(intersectionBox.top, groupBox.top);
+                                        intersectionBox.right = Math.min(intersectionBox.right, groupBox.right);
+                                        intersectionBox.bottom = Math.min(intersectionBox.bottom, groupBox.bottom);
+                                    }
+                                });
+                                
+                                // If valid intersection exists, place node there
+                                if (intersectionBox && 
+                                    intersectionBox.left < intersectionBox.right && 
+                                    intersectionBox.top < intersectionBox.bottom) {
+                                    
+                                    const centerX = (intersectionBox.left + intersectionBox.right) / 2;
+                                    const centerY = (intersectionBox.top + intersectionBox.bottom) / 2;
+                                    
+                                    // Add random offset for natural placement
+                                    const randOffsetX = (Math.random() * 30) - 15;
+                                    const randOffsetY = (Math.random() * 30) - 15;
+                                    
+                                    position = {
+                                        x: centerX - 40 + randOffsetX,
+                                        y: centerY - 40 + randOffsetY
+                                    };
+                                } else {
+                                    // Fallback: calculate average position
+                                    let validGroupCount = 0;
+                                    let avgX = 0, avgY = 0;
+                                    
+                                    relevantGroups.forEach(g => {
+                                        if (groupSettings[g]) {
+                                            const centerX = groupSettings[g].position.x + groupSettings[g].width/2;
+                                            const centerY = groupSettings[g].position.y + groupSettings[g].height/2;
+                                            
+                                            avgX += centerX;
+                                            avgY += centerY;
+                                            validGroupCount++;
+                                        }
+                                    });
+                                    
+                                    if (validGroupCount > 0) {
+                                        avgX /= validGroupCount;
+                                        avgY /= validGroupCount;
+                                    }
+                                    
+                                    // Add random offset for natural placement
+                                    const randOffsetX = (Math.random() * 30) - 15;
+                                    const randOffsetY = (Math.random() * 30) - 15;
+                                    
+                                    position = {
+                                        x: avgX - 40 + randOffsetX,
+                                        y: avgY - 40 + randOffsetY
+                                    };
+                                }
+                            }
+                        } else {
+                            // For single-group nodes, use standard grid position with randomness
+                            const row = Math.floor(index / columns);
+                            const col = index % columns;
+                            
+                            // Add random offset for authentic detective board look
+                            const randOffsetX = (Math.random() * 25) - 12.5;
+                            const randOffsetY = (Math.random() * 25) - 12.5;
+                            
+                            position = {
+                                x: x + horizontalPadding * (col + 1) - 40 + randOffsetX,
+                                y: y + verticalPadding * (row + 1) - 40 + randOffsetY
+                            };
+                        }
+                        
+                        // Create the visual element with image URL
+                        const imageElement = createImageElement(item, item.image, position);
+                        board.appendChild(imageElement);
+                        
+                        // Mark this node as created
+                        createdNodeIds.add(nodeId);
+                        
+                        // Store position for later connections
+                        elementPositions[nodeId] = position;
+                    });
+                });
+                
+                return elementPositions;
+            }
+            
+            // Create threads connecting nodes within the same group
+            function createThreads(nodeData, positions) {
+                // Track created connections to avoid duplicates
+                const createdConnections = new Set();
+                
+                // Connect nodes that share the same group
+                nodeData.forEach(node => {
+                    if (!node.groups || node.groups.length === 0) return;
+                    
+                    const nodeId = node.node;
+                    const nodePos = positions[nodeId];
+                    if (!nodePos) return;
+                    
+                    // Find other nodes in the same groups
+                    nodeData.forEach(otherNode => {
+                        if (node === otherNode) return; // Skip self
+                        
+                        const otherNodeId = otherNode.node;
+                        const otherNodePos = positions[otherNodeId];
+                        if (!otherNodePos) return;
+                        
+                        // Check if they share any groups
+                        const sharedGroups = node.groups.filter(g => 
+                            otherNode.groups && otherNode.groups.includes(g)
+                        );
+                        
+                        if (sharedGroups.length > 0) {
+                            // Create a unique connection ID (sorted to ensure the same ID regardless of order)
+                            const connectionIds = [nodeId, otherNodeId].sort();
+                            const connectionId = connectionIds.join('-');
+                            
+                            // Skip if we already created this connection
+                            if (createdConnections.has(connectionId)) return;
+                            createdConnections.add(connectionId);
+                            
+                            // Adjust to center of the profile image
+                            const fromX = nodePos.x + 40;
+                            const fromY = nodePos.y + 40;
+                            const toX = otherNodePos.x + 40;
+                            const toY = otherNodePos.y + 40;
+                            
+                            // Calculate the distance and angle
+                            const dx = toX - fromX;
+                            const dy = toY - fromY;
+                            const distance = Math.sqrt(dx * dx + dy * dy);
+                            const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                            
+                            // Select a color from palette
+                            const colorIndex = Math.floor(Math.random() * colorPalette.length);
+                            const threadColor = colorPalette[colorIndex];
+                            
+                            // Create thread element
+                            const thread = document.createElement('div');
+                            thread.className = 'thread';
+                            thread.style.width = `${distance}px`;
+                            thread.style.left = `${fromX}px`;
+                            thread.style.top = `${fromY}px`;
+                            thread.style.transform = `rotate(${angle}deg)`;
+                            thread.style.backgroundColor = threadColor;
+                            
+                            board.appendChild(thread);
+                        }
+                    });
+                });
+            }
+            
+            // Zoom and pan functionality with boundaries
+            function initializeZoomAndPan() {
+                // Define boundaries for panning
+                const minX = boardContainer.clientWidth - board.clientWidth * scale;
+                const maxX = 0;
+                const minY = boardContainer.clientHeight - board.clientHeight * scale;
+                const maxY = 0;
+                
+                // Helper function to constrain translation within boundaries
+                function constrainTranslation() {
+                    // Calculate current boundaries based on scale
+                    const currentMinX = boardContainer.clientWidth - board.clientWidth * scale;
+                    const currentMinY = boardContainer.clientHeight - board.clientHeight * scale;
+                    
+                    translateX = Math.min(maxX, Math.max(currentMinX, translateX));
+                    translateY = Math.min(maxY, Math.max(currentMinY, translateY));
+                }
+                
+                // Zoom controls
+                zoomInBtn.addEventListener('click', () => {
+                    scale = Math.min(scale * 1.2, 5);
+                    updateBoardTransform();
+                });
+                
+                zoomOutBtn.addEventListener('click', () => {
+                    scale = Math.max(scale / 1.2, 0.3);
+                    updateBoardTransform();
+                });
+                
+                resetBtn.addEventListener('click', () => {
+                    scale = 0.8; // Reset to initial zoom
+                    initializeBoard();
+                });
+                
+                // Mouse wheel zoom
+                boardContainer.addEventListener('wheel', (e) => {
+                    e.preventDefault();
+                    
+                    // Get mouse position relative to board
+                    const rect = boardContainer.getBoundingClientRect();
+                    const mouseX = e.clientX - rect.left;
+                    const mouseY = e.clientY - rect.top;
+                    
+                    // Calculate the point on the board where we're zooming
+                    const boardX = (mouseX - translateX) / scale;
+                    const boardY = (mouseY - translateY) / scale;
+                    
+                    // Adjust scale based on wheel direction
+                    const delta = -Math.sign(e.deltaY) * 0.1;
+                    const newScale = Math.max(0.3, Math.min(5, scale * (1 + delta)));
+                    
+                    // Adjust translation to keep the point under mouse stable
+                    if (scale !== newScale) {
+                        translateX = mouseX - boardX * newScale;
+                        translateY = mouseY - boardY * newScale;
+                        scale = newScale;
+                        
+                        // Apply constraints
+                        constrainTranslation();
+                        updateBoardTransform();
+                    }
+                });
+                
+                // Pan with mouse drag
+                boardContainer.addEventListener('mousedown', (e) => {
+                    if (e.target === board || e.target === boardContainer || e.target.classList.contains('group-container')) {
+                        e.preventDefault();
+                        startPanX = e.clientX - translateX;
+                        startPanY = e.clientY - translateY;
+                        isPanning = true;
+                    }
+                });
+                
+                document.addEventListener('mousemove', (e) => {
+                    if (isPanning) {
+                        translateX = e.clientX - startPanX;
+                        translateY = e.clientY - startPanY;
+                        
+                        // Apply constraints
+                        constrainTranslation();
+                        updateBoardTransform();
+                    }
+                });
+                
+                document.addEventListener('mouseup', () => {
+                    isPanning = false;
+                });
+                
+                // Touch pan
+                boardContainer.addEventListener('touchstart', (e) => {
+                    if (e.target === board || e.target === boardContainer || e.target.classList.contains('group-container')) {
+                        e.preventDefault();
+                        const touch = e.touches[0];
+                        startPanX = touch.clientX - translateX;
+                        startPanY = touch.clientY - translateY;
+                        isPanning = true;
+                    }
+                });
+                
+                document.addEventListener('touchmove', (e) => {
+                    if (isPanning && e.touches.length === 1) {
+                        e.preventDefault();
+                        const touch = e.touches[0];
+                        translateX = touch.clientX - startPanX;
+                        translateY = touch.clientY - startPanY;
+                        
+                        // Apply constraints
+                        constrainTranslation();
+                        updateBoardTransform();
+                    }
+                });
+                
+                document.addEventListener('touchend', () => {
+                    isPanning = false;
+                });
+                
+                // Pinch zoom for mobile
+                let lastTouchDistance = 0;
+                
+                boardContainer.addEventListener('touchstart', (e) => {
+                    if (e.touches.length === 2) {
+                        e.preventDefault();
+                        const touch1 = e.touches[0];
+                        const touch2 = e.touches[1];
+                        lastTouchDistance = Math.hypot(
+                            touch2.clientX - touch1.clientX,
+                            touch2.clientY - touch1.clientY
+                        );
+                    }
+                });
+                
+                boardContainer.addEventListener('touchmove', (e) => {
+                    if (e.touches.length === 2) {
+                        e.preventDefault();
+                        
+                        const touch1 = e.touches[0];
+                        const touch2 = e.touches[1];
+                        
+                        const currentDistance = Math.hypot(
+                            touch2.clientX - touch1.clientX,
+                            touch2.clientY - touch1.clientY
+                        );
+                        
+                        if (lastTouchDistance > 0) {
+                            // Calculate the center point between two touches
+                            const centerX = (touch1.clientX + touch2.clientX) / 2;
+                            const centerY = (touch1.clientY + touch2.clientY) / 2;
+                            
+                            // Get the point on the board
+                            const rect = boardContainer.getBoundingClientRect();
+                            const boardX = (centerX - rect.left - translateX) / scale;
+                            const boardY = (centerY - rect.top - translateY) / scale;
+                            
+                            // Calculate new scale
+                            const newScale = Math.max(0.3, Math.min(5, scale * (currentDistance / lastTouchDistance)));
+                            
+                            // Adjust translation to keep center point stable
+                            if (scale !== newScale) {
+                                translateX = centerX - boardX * newScale;
+                                translateY = centerY - boardY * newScale;
+                                scale = newScale;
+                                
+                                // Apply constraints
+                                constrainTranslation();
+                                updateBoardTransform();
+                            }
+                        }
+                        
+                        lastTouchDistance = currentDistance;
+                    }
+                });
+                
+                boardContainer.addEventListener('touchend', (e) => {
+                    if (e.touches.length < 2) {
+                        lastTouchDistance = 0;
+                    }
+                });
+            }
+            
+            // Function to extract unique groups from node data
+            function extractUniqueGroups(nodeData) {
+                const groups = new Set();
+                nodeData.forEach(node => {
+                    if (node.groups && Array.isArray(node.groups)) {
+                        node.groups.forEach(group => groups.add(group));
+                    }
+                });
+                return Array.from(groups);
+            }
+            
+            // Get nodes that belong to a specific group
+            function getNodesInGroup(nodeData, groupName) {
+                return nodeData.filter(node => 
+                    node.groups && 
+                    Array.isArray(node.groups) && 
+                    node.groups.includes(groupName)
+                );
+            }
+            
+            // Function to generate group settings based on the number of groups
+            function generateGroupSettings(groups) {
+                const settings = {};
+                const boardCenterX = 1000; // Center of the board
+                const boardCenterY = 750;  // Center of the board
+                const radius = 450; // Distance from center to group center
+                
+                // Filter out "Origin" as it shouldn't be displayed as a group
+                const displayGroups = groups.filter(group => group !== "Origin");
+                
+                // Position groups in a circle around the center
+                displayGroups.forEach((group, index) => {
+                    const angle = (index / displayGroups.length) * 2 * Math.PI; // Distribute evenly
+                    const x = boardCenterX + radius * Math.cos(angle) - 225; // Offset for width
+                    const y = boardCenterY + radius * Math.sin(angle) - 175; // Offset for height
+                    
+                    settings[group] = {
+                        position: { x, y },
+                        width: 450,
+                        height: 350
+                    };
+                });
+                
+                return settings;
+            }
+            
+            // Zoom to specific group
+            function zoomToGroup(groupName) {
+                const groupPos = groupPositions[groupName];
+                
+                if (!groupPos) return;
+                
+                // Calculate the appropriate scale based on group size and board container
+                const containerWidth = boardContainer.clientWidth;
+                const containerHeight = boardContainer.clientHeight;
+                
+                // Calculate scale to fit group
+                const scaleX = containerWidth / (groupPos.width * 1.2); // Add margin
+                const scaleY = containerHeight / (groupPos.height * 1.2); // Add margin
+                const newScale = Math.min(scaleX, scaleY, 3); // Cap maximum zoom
+                
+                // Set new scale and center on group
+                scale = newScale;
+                translateX = (containerWidth / 2) - (groupPos.centerX * scale);
+                translateY = (containerHeight / 2) - (groupPos.centerY * scale);
+                
+                // Update board transform
+                updateBoardTransform();
+                
+                // Show zoom focus indicator briefly
+                zoomFocus.style.display = 'block';
+                zoomFocus.style.left = `${groupPos.x}px`;
+                zoomFocus.style.top = `${groupPos.y}px`;
+                zoomFocus.style.width = `${groupPos.width}px`;
+                zoomFocus.style.height = `${groupPos.height}px`;
+                
+                // Hide focus indicator after animation
+                setTimeout(() => {
+                    zoomFocus.style.display = 'none';
+                }, 2000);
+            }
+            
+            // Setup group selection dropdown
+            function setupGroupMenu(groups) {
+                // Clear existing dropdown
+                groupDropdown.innerHTML = '';
+                
+                // Add "All Groups" option
+                const allButton = document.createElement('button');
+                allButton.textContent = 'All Groups';
+                allButton.addEventListener('click', () => {
+                    // Reset to default view
+                    scale = 0.8;
+                    initializeBoard();
+                    
+                    // Hide dropdown
+                    groupDropdown.style.display = 'none';
+                });
+                groupDropdown.appendChild(allButton);
+                
+                // Add each group option
+                groups.forEach(groupName => {
+                    if (groupName === 'Origin') return; // Skip Origin group
+                    
+                    const groupButton = document.createElement('button');
+                    groupButton.textContent = groupName;
+                    groupButton.addEventListener('click', () => {
+                        zoomToGroup(groupName);
+                        
+                        // Hide dropdown
+                        groupDropdown.style.display = 'none';
+                    });
+                    
+                    groupDropdown.appendChild(groupButton);
+                });
+                
+                // Toggle dropdown on button click
+                groupMenuBtn.addEventListener('click', () => {
+                    if (groupDropdown.style.display === 'block') {
+                        groupDropdown.style.display = 'none';
+                    } else {
+                        groupDropdown.style.display = 'block';
+                    }
+                });
+                
+                // Close dropdown when clicking elsewhere
+                document.addEventListener('click', (e) => {
+                    if (!groupMenuBtn.contains(e.target) && !groupDropdown.contains(e.target)) {
+                        groupDropdown.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Initialize the board
+            async function initialize() {
+                try {
+                    // Clear the board
+                    board.innerHTML = '';
+                    
+                    // Load node data
+                    const nodeData = await loadData();
+                    
+                    // Extract unique groups
+                    const uniqueGroups = extractUniqueGroups(nodeData);
+                    console.log("Found groups:", uniqueGroups);
+                    
+                    // Generate group settings dynamically
+                    groupSettings = generateGroupSettings(uniqueGroups);
+                    
+                    // Create group containers and nodes
+                    const positions = createGroupContainers(nodeData);
+                    
+                    // Create threads connecting related nodes
+                    createThreads(nodeData, positions);
+                    
+                    // Setup group selection menu
+                    setupGroupMenu(uniqueGroups);
+                    
+                    // Initialize board position
+                    initializeBoard();
+                    
+                    // Setup zoom and pan controls
+                    initializeZoomAndPan();
+                    
+                    // Hide loading overlay
+                    setTimeout(() => {
+                        document.getElementById('loading-overlay').style.display = 'none';
+                    }, 500);
+                } catch (error) {
+                    console.error("Error initializing board:", error);
+                    document.getElementById('loading-overlay').innerHTML = `
+                        <p>Error loading the investigation board.</p>
+                        <p>${error.message}</p>
+                    `;
+                }
+            }
+            
+            // Display node details in a modal
+            function showNodeDetails(nodeData, imageUrl) {
+                const overlay = document.getElementById('overlay');
+                const detailsPanel = document.getElementById('node-details');
+                const detailName = document.getElementById('detail-name');
+                const detailImage = document.getElementById('detail-image');
+                const detailGroups = document.getElementById('detail-groups');
+                const detailDescription = document.getElementById('detail-description');
+                
+                // Set node details
+                detailName.textContent = nodeData.node;
+                detailImage.src = imageUrl;
+                detailImage.alt = nodeData.node;
+                
+                // Clear previous groups
+                detailGroups.innerHTML = '';
+                
+                // Add group tags
+                if (nodeData.groups && nodeData.groups.length > 0) {
+                    nodeData.groups.forEach(group => {
+                        const groupTag = document.createElement('span');
+                        groupTag.className = 'group-tag';
+                        groupTag.textContent = group;
+                        detailGroups.appendChild(groupTag);
+                    });
+                }
+                
+                // Set description
+                const description = nodeData.description || 
+                    `Subject ${nodeData.node} is connected to ${
+                        (nodeData.groups && nodeData.groups.length > 0) ? 
+                        nodeData.groups.join(', ') : 'no specific groups'
+                    }.`;
+                    
+                detailDescription.textContent = description;
+                
+                if (nodeData.link) {
+                    // Add link to profile if available
+                    const linkPara = document.createElement('p');
+                    const linkAnchor = document.createElement('a');
+                    linkAnchor.href = nodeData.link;
+                    linkAnchor.textContent = "View Profile";
+                    linkAnchor.target = "_blank";
+                    linkAnchor.style.color = "#ff6666";
+                    linkPara.appendChild(linkAnchor);
+                    detailDescription.appendChild(document.createElement('br'));
+                    detailDescription.appendChild(linkPara);
+                }
+                
+                // Show modal and overlay
+                overlay.style.display = 'block';
+                detailsPanel.style.display = 'block';
+            }
+            
+            // Close node details modal
+            document.getElementById('close-details').addEventListener('click', () => {
+                document.getElementById('overlay').style.display = 'none';
+                document.getElementById('node-details').style.display = 'none';
+            });
+            
+            // Close modal when clicking on overlay
+            document.getElementById('overlay').addEventListener('click', () => {
+                document.getElementById('overlay').style.display = 'none';
+                document.getElementById('node-details').style.display = 'none';
+            });
+            
+            // Start the application
+            initialize();
+            
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                initializeBoard();
+            });
+        });
+    </script>
+</body>
+</html>
