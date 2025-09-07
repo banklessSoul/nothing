@@ -8,7 +8,7 @@ const tweetsData = [
         "username": "@SHL0MS",
         "timestamp": "Nov 5, 2020",
         "type": "origin",
-        "profilePic": "https://pbs.twimg.com/profile_images/1920126904994082816/EBFBcYtO_400x400.png",
+        "profilePic": "./SHL0MS.png",
         "animate": true
     },
     {
@@ -38,7 +38,7 @@ const tweetsData = [
         "author": "Raydium",
         "username": "@RaydiumProtocol",
         "timestamp": "Jul 10, 2025",
-        "profilePic": "https://pbs.twimg.com/profile_images/1742621757230678016/_Av2hYEY_400x400.jpg",
+        "profilePic": "./RaydiumProtocol.jpg",
         "animate": true
     },
     {
@@ -48,7 +48,7 @@ const tweetsData = [
         "author": "Ola Ξlixir",
         "username": "@thegreatola",
         "timestamp": "Jul 20, 2025",
-        "profilePic": "https://pbs.twimg.com/profile_images/1945817318388305920/hrVc8K5f_400x400.jpg",
+        "profilePic": "./thegreatola.jpg",
         "animate": true
     },
     {
@@ -58,7 +58,7 @@ const tweetsData = [
         "author": "&rlm;",
         "username": "@user0000O0",
         "timestamp": "Jul 21, 2025",
-        "profilePic": "https://pbs.twimg.com/profile_images/1842335199184515072/Ll2z_0VH_400x400.jpg",
+        "profilePic": "./dummy.png",
         "animate": true
     },
     {
@@ -68,7 +68,7 @@ const tweetsData = [
         "author": "Slap",
         "username": "@slvppy",
         "timestamp": "July 23, 2024",
-        "profilePic": "https://pbs.twimg.com/profile_images/1478227815333969920/4lTpR0An_400x400.jpg",
+        "profilePic": "./slvppy.jpg",
         "animate": true
     },
     {
@@ -78,7 +78,7 @@ const tweetsData = [
         "author": "Pleasr",
         "username": "@PleasrDAO",
         "timestamp": "Aug 6, 2025",
-        "profilePic": "https://pbs.twimg.com/profile_images/1893093825473613824/yYqAO0Nl_400x400.jpg",
+        "profilePic": "./PleasrDAO.jpg",
         "animate": true
     },
     {
@@ -88,7 +88,7 @@ const tweetsData = [
         "author": "DogeDesigner",
         "username": "@cb_doge",
         "timestamp": "Apr 1, 2025",
-        "profilePic": "https://pbs.twimg.com/profile_images/1498070100393754625/C2V-fbll_400x400.jpg",
+        "profilePic": "./cb_doge.jpg",
         "animate": true
     },
     {
@@ -98,7 +98,7 @@ const tweetsData = [
         "author": "DA VINKI",
         "username": "@VorosTwins",
         "timestamp": "Jul 18, 2025",
-        "profilePic": "https://pbs.twimg.com/profile_images/1484161306512920576/PE8QqPge_400x400.jpg",
+        "profilePic": "./VorosTwins.jpg",
         "animate": true
     },
     {
@@ -108,7 +108,7 @@ const tweetsData = [
         "author": "Lost Meme Archive",
         "username": "@LostMemeArchive",
         "timestamp": "Jul 3, 2025",
-        "profilePic": "https://pbs.twimg.com/profile_images/1914120748567785472/ffFpNobt_400x400.png",
+        "profilePic": "./dummy.png",
         "animate": true
     },
     {
@@ -128,7 +128,7 @@ const tweetsData = [
         "author": "Chill House",
         "username": "@ChillHouseSOL",
         "timestamp": "Jun 21, 2025",
-        "profilePic": "https://pbs.twimg.com/profile_images/1918595988778094592/1irHeiVg_400x400.jpg",
+        "profilePic": "./ChillHouseSOL.jpg",
         "animate": false
     },
     {
@@ -138,7 +138,7 @@ const tweetsData = [
         "author": "loosty",
         "username": "@serloost",
         "timestamp": "Jul 19, 2025",
-        "profilePic": "https://pbs.twimg.com/profile_images/1900390157330583552/7TnP9HSb_400x400.jpg",
+        "profilePic": "./serloost.jpg",
         "animate": false
     },
     {
@@ -148,7 +148,7 @@ const tweetsData = [
         "author": "Everything",
         "username": "@isjuustadream",
         "timestamp": "Aug 2, 2025",
-        "profilePic": "https://pbs.twimg.com/profile_images/1845179276779536384/0p6ToUxn_400x400.jpg",
+        "profilePic": "./isjuustadream.jpg",
         "animate": false
     }
 ];
