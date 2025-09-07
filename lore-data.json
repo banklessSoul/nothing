@@ -2,7 +2,7 @@
   {
     "user": 1,
     "name": "SHL0MS",
-    "image": "https://pbs.twimg.com/profile_images/1920126904994082816/EBFBcYtO_400x400.png",
+    "image": "./images/SHL0MS.png",
     "theory": [
       {
         "name": "The design",
@@ -41,7 +41,7 @@
   {
     "user": 3,
     "name": "⨳ Telos ⨳ ɎS ✦",
-    "image": "https://pbs.twimg.com/profile_images/1945377435064664064/tCyRvNMi_400x400.jpg",
+    "image": "./images/telos.jpg",
     "theory": [
       {
         "name": "Holder 🔄 Developer",
