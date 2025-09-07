@@ -8,7 +8,7 @@ const tweetsData = [
         "username": "@SHL0MS",
         "timestamp": "Nov 5, 2020",
         "type": "origin",
-        "profilePic": "./SHL0MS.png",
+        "profilePic": "./images/SHL0MS.png",
         "animate": true
     },
     {
@@ -18,7 +18,7 @@ const tweetsData = [
         "author": "God",
         "username": "@god",
         "timestamp": "Nov 8, 2024",
-        "profilePic": "https://pbs.twimg.com/profile_images/1880403110893400065/iMwI-2m-_400x400.jpg",
+        "profilePic": "./images/god.jpg",
         "animate": true
     },
     {
@@ -28,7 +28,7 @@ const tweetsData = [
         "author": "Satan",
         "username": "@s8n",
         "timestamp": "Dec 4, 2024",
-        "profilePic": "https://pbs.twimg.com/profile_images/1880278672222916608/xIG6V6Rn_400x400.jpg",
+        "profilePic": "./images/s8n.jpg",
         "animate": true
     },
     {
@@ -38,7 +38,7 @@ const tweetsData = [
         "author": "Raydium",
         "username": "@RaydiumProtocol",
         "timestamp": "Jul 10, 2025",
-        "profilePic": "./RaydiumProtocol.jpg",
+        "profilePic": "./images/RaydiumProtocol.jpg",
         "animate": true
     },
     {
@@ -48,7 +48,7 @@ const tweetsData = [
         "author": "Ola Ξlixir",
         "username": "@thegreatola",
         "timestamp": "Jul 20, 2025",
-        "profilePic": "./thegreatola.jpg",
+        "profilePic": "./images/thegreatola.jpg",
         "animate": true
     },
     {
@@ -58,7 +58,7 @@ const tweetsData = [
         "author": "&rlm;",
         "username": "@user0000O0",
         "timestamp": "Jul 21, 2025",
-        "profilePic": "./dummy.png",
+        "profilePic": "./images/dummy.png",
         "animate": true
     },
     {
@@ -68,7 +68,7 @@ const tweetsData = [
         "author": "Slap",
         "username": "@slvppy",
         "timestamp": "July 23, 2024",
-        "profilePic": "./slvppy.jpg",
+        "profilePic": "./images/slvppy.jpg",
         "animate": true
     },
     {
@@ -78,7 +78,7 @@ const tweetsData = [
         "author": "Pleasr",
         "username": "@PleasrDAO",
         "timestamp": "Aug 6, 2025",
-        "profilePic": "./PleasrDAO.jpg",
+        "profilePic": "./images/PleasrDAO.jpg",
         "animate": true
     },
     {
@@ -88,7 +88,7 @@ const tweetsData = [
         "author": "DogeDesigner",
         "username": "@cb_doge",
         "timestamp": "Apr 1, 2025",
-        "profilePic": "./cb_doge.jpg",
+        "profilePic": "./images/cb_doge.jpg",
         "animate": true
     },
     {
@@ -98,7 +98,7 @@ const tweetsData = [
         "author": "DA VINKI",
         "username": "@VorosTwins",
         "timestamp": "Jul 18, 2025",
-        "profilePic": "./VorosTwins.jpg",
+        "profilePic": "./images/VorosTwins.jpg",
         "animate": true
     },
     {
@@ -108,7 +108,7 @@ const tweetsData = [
         "author": "Lost Meme Archive",
         "username": "@LostMemeArchive",
         "timestamp": "Jul 3, 2025",
-        "profilePic": "./dummy.png",
+        "profilePic": "./images/dummy.png",
         "animate": true
     },
     {
@@ -118,7 +118,7 @@ const tweetsData = [
         "author": "🐈‍⬛",
         "username": "@Cyb4rAnG3L",
         "timestamp": "Aug 8, 2025",
-        "profilePic": "https://pbs.twimg.com/profile_images/1938321133884813312/BU8hdbr__400x400.jpg",
+        "profilePic": "./images/Cyb4rAnG3L.jpg",
         "animate": true
     },
     {
@@ -128,7 +128,7 @@ const tweetsData = [
         "author": "Chill House",
         "username": "@ChillHouseSOL",
         "timestamp": "Jun 21, 2025",
-        "profilePic": "./ChillHouseSOL.jpg",
+        "profilePic": "./images/ChillHouseSOL.jpg",
         "animate": false
     },
     {
@@ -138,7 +138,7 @@ const tweetsData = [
         "author": "loosty",
         "username": "@serloost",
         "timestamp": "Jul 19, 2025",
-        "profilePic": "./serloost.jpg",
+        "profilePic": "./images/serloost.jpg",
         "animate": false
     },
     {
@@ -148,7 +148,7 @@ const tweetsData = [
         "author": "Everything",
         "username": "@isjuustadream",
         "timestamp": "Aug 2, 2025",
-        "profilePic": "./isjuustadream.jpg",
+        "profilePic": "./images/isjuustadream.jpg",
         "animate": false
     }
 ];
